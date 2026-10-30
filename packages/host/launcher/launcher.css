@@ -1,0 +1,91 @@
+:root {
+  --bg: #15171c; --panel: #1d2027; --line: #2d323c; --text: #e6e8ec; --dim: #9aa1ad;
+  --accent: #5fb3ff; --accent-bg: #1f4f7a; --bad: #ff7b7b; --bad-bg: #3a1d1f; --good: #7fd88f;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { font-size: 15px; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.45 system-ui, "Segoe UI", sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 20px 28px; }
+header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+h1 { margin: 0; font-size: 1.5rem; }
+h2 { margin: 0; font-size: 1.1rem; }
+#version { color: var(--dim); }
+section { margin-bottom: 22px; }
+label { display: block; color: var(--dim); font-size: 0.85rem; margin-bottom: 4px; }
+.row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 10px; flex-wrap: wrap; }
+.row.between { justify-content: space-between; align-items: center; }
+.field { display: block; }
+.field.grow { flex: 1 1 220px; }
+.check { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 1rem; padding-bottom: 7px; margin: 0; }
+input[type=text], select, button {
+  font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px;
+}
+input[type=text] { width: 100%; }
+#root { flex: 1 1 300px; width: auto; }
+input[type=checkbox] { width: 1.1rem; height: 1.1rem; }
+button { cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button.primary { background: var(--accent-bg); border-color: var(--accent); padding: 8px 28px; font-weight: 600; }
+#status { color: var(--dim); }
+.cmd { font: 0.85rem/1.4 Consolas, "Cascadia Mono", monospace; color: var(--dim); word-break: break-all; min-height: 1.2em; }
+.error { margin-top: 10px; padding: 10px 12px; background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 6px; color: #ffd6d6; white-space: pre-wrap; word-break: break-word; }
+.recent { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.recent button { font-size: 0.8rem; padding: 3px 8px; color: var(--dim); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.replay { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.replay .bad { color: var(--bad); font-weight: 600; }
+.replay .ok { color: var(--good); }
+.session { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+.session .head { font-weight: 600; word-break: break-all; }
+.session .meta { color: var(--dim); font-size: 0.9rem; margin: 2px 0 8px; }
+.session .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.session .actions select { max-width: 170px; padding: 6px 6px; }
+.session .group { display: flex; gap: 4px; }
+.empty { color: var(--dim); padding: 8px 0; }
+
+/* v1.3 */
+header { flex-wrap: wrap; }
+.demo-pick { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.demo-pick label { margin: 0; }
+.hint { color: var(--dim); font-size: 0.85rem; }
+label .hint { margin-left: 4px; }
+.field.narrow { width: 7.5rem; }
+input[type=number] { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; width: 100%; }
+#capture { align-items: flex-end; }
+#capture-hint { padding-bottom: 8px; }
+.group { display: flex; gap: 4px; }
+.session .actions select.picker { max-width: 100%; width: 21rem; }
+.session .actions select.resume-at { max-width: 100%; width: 12rem; }
+#check-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+#check-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 6px 0; }
+#check-table th { text-align: left; color: var(--dim); font-weight: 500; border-bottom: 1px solid var(--line); padding: 3px 6px; }
+#check-table td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; word-break: break-word; }
+#check-table .ok { color: var(--good); }
+#check-table .bad { color: var(--bad); font-weight: 600; }
+#check-table .dim { color: var(--dim); }
+#check-table .confirm { color: var(--text); }
+#check-table button { font-size: 0.85rem; padding: 3px 9px; }
+.overlay { position: fixed; inset: 0; background: rgba(8, 9, 12, 0.72); display: flex; align-items: flex-start; justify-content: center; padding: 6vh 20px 20px; z-index: 10; }
+.dialog { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; width: min(820px, 100%); max-height: 88vh; overflow: auto; }
+.dialog pre { margin: 6px 0 12px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; font: 0.85rem/1.45 Consolas, "Cascadia Mono", monospace; overflow-x: auto; white-space: pre; }
+.where { margin: 6px 0; word-break: break-all; }
+#toast { position: fixed; right: 20px; bottom: 20px; background: var(--accent-bg); border: 1px solid var(--accent); color: var(--text); padding: 8px 16px; border-radius: 6px; z-index: 20; }
+body.dropping main { outline: 2px dashed var(--accent); outline-offset: -6px; }
+
+/* v1.4 */
+.grow-col { flex: 1 1 auto; min-width: 0; }
+.group.wrap { flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+.replay { flex-wrap: wrap; }
+#status-select { max-width: 11rem; padding: 6px 6px; }
+#status-of { width: 8.5rem; padding: 6px 8px; }
+#attach-row { margin-bottom: 4px; }
+#attach-hint { margin-bottom: 12px; }
+#attach-target { width: 100%; max-width: 100%; }
+.found { margin: 8px 0 12px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.found code, .paste-line code { font: 0.9rem Consolas, "Cascadia Mono", monospace; color: var(--good); }
+#setup-found-line { font-size: 1.05rem; }
+.paste-line { font-size: 1.05rem; font-weight: 600; }
+.session .from { color: var(--accent); }
+.triage-ok { color: var(--good); }

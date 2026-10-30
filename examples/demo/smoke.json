@@ -1,0 +1,18 @@
+[
+  { "wait": 2500 },
+  { "keys": ["KeyD", "Space"], "hold": 800 },
+  { "mark": "smoke mark" },
+  { "wait": 400 },
+  { "key": "KeyE", "ms": 80 },
+  { "wait": 500 },
+  { "key": "KeyX", "ms": 80 },
+  { "wait": 500 },
+  { "key": "KeyL", "ms": 80 },
+  { "wait": 600 },
+  { "key": "KeyT", "ms": 80 },
+  { "wait": 500 },
+  { "key": "KeyG", "ms": 80 },
+  { "wait": 1500 },
+  { "expect": { "marksAtLeast": 5, "exceptions": 1, "errors": 1, "triggers": ["smoke", "error", "exception", "fps", "assert"], "ready": { "sdk": true, "state": true, "frame": true, "stepper": true } } },
+  { "end": true }
+]

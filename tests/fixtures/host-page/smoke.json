@@ -1,0 +1,19 @@
+[
+  { "wait": 1500 },
+  { "key": "KeyA" },
+  { "mark": "smoke mark" },
+  { "key": "KeyE" },
+  { "wait": 500 },
+  { "key": "KeyX" },
+  { "wait": 500 },
+  { "hotkey": "mark" },
+  { "wait": 1200 },
+  { "type": "hello" },
+  { "key": "Enter" },
+  { "wait": 500 },
+  { "key": "KeyB" },
+  { "wait": 300 },
+  { "mark": "after the note" },
+  { "expect": { "marksAtLeast": 5, "exceptions": 1, "errors": 2, "triggers": ["smoke", "error", "exception", "hotkey"] } },
+  { "end": true }
+]

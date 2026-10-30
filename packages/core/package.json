@@ -1,0 +1,12 @@
+{
+  "name": "@snapper/core",
+  "version": "1.0.0",
+  "description": "Snapper session format I/O: writer, reader, SESSION.md renderer, tape and perf helpers.",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "license": "MIT",
+  "private": true
+}

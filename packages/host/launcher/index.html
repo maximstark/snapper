@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snapper</title>
+<link rel="stylesheet" href="launcher.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Snapper</h1>
+    <span id="version"></span>
+    <div class="demo-pick">
+      <label for="demos">Demos</label>
+      <select id="demos" aria-label="Bundled demos"></select>
+      <button id="try" type="button" title="Play a bundled demo; its sessions go under the app's data folder">Try</button>
+    </div>
+  </header>
+
+  <section id="game" aria-label="Game">
+    <label for="root">Game folder <span class="hint">(drop a folder here, or a tester's .zip to import their session)</span></label>
+    <div class="row">
+      <input id="root" type="text" spellcheck="false" placeholder="C:/path/to/game (a folder with index.html)">
+      <button id="browse" type="button">Browse…</button>
+    </div>
+    <div id="recent" class="recent"></div>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="url">URL (optional)</label>
+        <input id="url" type="text" spellcheck="false" placeholder="http://127.0.0.1:8080/index.html (empty = serve the folder)">
+      </div>
+    </div>
+
+    <div class="row fields">
+      <div class="field">
+        <label for="preset">Preset</label>
+        <select id="preset">
+          <option value="deck">deck</option>
+          <option value="1080p">1080p</option>
+          <option value="ultrawide">ultrawide</option>
+          <option value="native">native</option>
+        </select>
+      </div>
+      <label class="check"><input id="fullscreen" type="checkbox"> Fullscreen</label>
+      <div class="field grow">
+        <label for="query">Query</label>
+        <input id="query" type="text" spellcheck="false" placeholder="?scene=stage&amp;level=1-1 (empty = none)">
+      </div>
+    </div>
+
+    <div class="row fields" id="capture" aria-label="Capture settings">
+      <div class="field narrow">
+        <label for="hotkey">Mark key</label>
+        <input id="hotkey" type="text" spellcheck="false" maxlength="16" placeholder="F8">
+      </div>
+      <div class="field narrow">
+        <label for="padHold">Pad hold ms</label>
+        <input id="padHold" type="number" min="100" max="5000" step="50" placeholder="400">
+      </div>
+      <div class="field narrow">
+        <label for="ring">Ring s</label>
+        <input id="ring" type="number" min="1" max="30" step="1" placeholder="5">
+      </div>
+      <label class="check"><input id="bare" type="checkbox"> Bare</label>
+      <button id="capture-reset" type="button" title="Back to the game's own capture settings">Reset</button>
+      <span id="capture-hint" class="hint"></span>
+    </div>
+
+    <div class="row" id="attach-row" aria-label="Attach">
+      <div class="field grow">
+        <label for="attach-endpoint">Attach to a browser that is already running <span class="hint">(DevTools endpoint)</span></label>
+        <input id="attach-endpoint" type="text" spellcheck="false" placeholder="http://127.0.0.1:9222">
+      </div>
+      <div class="field grow" id="attach-target-field" hidden>
+        <label for="attach-target">Page</label>
+        <select id="attach-target" aria-label="Page to attach to"></select>
+      </div>
+      <button id="attach" type="button" title="Capture the page of a Chrome or Edge you started with --remote-debugging-port; sessions go to this game folder">Attach</button>
+    </div>
+    <div id="attach-hint" class="hint">Start Chrome or Edge with --remote-debugging-port=9222 --user-data-dir=%TEMP%\snapper-chrome</div>
+
+    <div class="row">
+      <button id="play" type="button" class="primary">Play</button>
+      <button id="setup" type="button" title="Install the Snapper skill into this game's .claude folder and show the integration recipe">Set up for Claude</button>
+      <button id="check" type="button" title="Replay the marks of the newest sessions on the current code">Check</button>
+      <span id="status" role="status"></span>
+    </div>
+    <div id="cmd" class="cmd" title="The command line that does the same"></div>
+    <div id="error" class="error" role="alert" hidden></div>
+  </section>
+
+  <section id="check-box" aria-label="Check" hidden>
+    <div class="row between">
+      <h2>Check</h2>
+      <span id="check-line" class="hint"></span>
+    </div>
+    <div id="check-cmd" class="cmd"></div>
+    <table id="check-table"><thead><tr><th>Session</th><th>Mark</th><th>Note</th><th>Result</th><th></th></tr></thead><tbody id="check-rows"></tbody></table>
+    <div id="check-summary" class="hint"></div>
+  </section>
+
+  <section id="sessions" aria-label="Sessions">
+    <div class="row between">
+      <h2>Sessions</h2>
+      <button id="refresh" type="button">Refresh</button>
+    </div>
+    <div id="replay-box" class="replay" hidden>
+      <div class="grow-col">
+        <div id="replay-line"></div>
+        <div id="triage-line" class="hint" hidden></div>
+      </div>
+      <div class="group wrap">
+        <select id="status-select" aria-label="Triage status" hidden>
+          <option value="">Status…</option>
+          <option value="open">open</option>
+          <option value="fixed">fixed</option>
+          <option value="wontfix">wontfix</option>
+          <option value="duplicate">duplicate</option>
+          <option value="cannot-reproduce">cannot-reproduce</option>
+        </select>
+        <input id="status-of" type="text" spellcheck="false" maxlength="4" placeholder="of mark 0001" aria-label="Duplicate of mark" hidden>
+        <button id="status-apply" type="button" hidden>Set</button>
+        <button id="copy-issue" type="button" title="Copy the issue text (Markdown) for this mark" hidden>Copy issue</button>
+        <button id="copy-replay" type="button" hidden>Copy for Claude</button>
+        <button id="replay-open" type="button" hidden>Open folder</button>
+      </div>
+    </div>
+    <div id="list"></div>
+  </section>
+</main>
+
+<div id="dialog" class="overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title" hidden>
+  <div class="dialog">
+    <h2 id="dialog-title">Set up for Claude</h2>
+    <p id="setup-where" class="where"></p>
+    <div id="setup-found" class="found" data-layout hidden>
+      <div id="setup-found-line"></div>
+      <div id="setup-seen" class="hint"></div>
+    </div>
+    <div id="setup-candidates" class="found" data-layout hidden>
+      <div id="setup-paste-line" class="paste-line"></div>
+      <div id="setup-guess" class="hint"></div>
+    </div>
+    <div id="setup-recipe-box">
+      <p class="hint">The recipe (also in docs/SDK.md, "Integration recipe"):</p>
+      <pre id="setup-recipe" data-layout></pre>
+    </div>
+    <div class="row">
+      <button id="setup-copy" type="button" class="primary">Copy recipe</button>
+      <button id="setup-recipe-toggle" type="button" hidden>Show the recipe anyway</button>
+      <button id="setup-close" type="button">Close</button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="launcher.js"></script>
+</body>
+</html>

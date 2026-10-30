@@ -1,0 +1,3 @@
+#!/bin/sh
+# Public-repo guard on every tracked file before anything leaves this machine (scripts/check-public.mjs).
+exec node scripts/check-public.mjs

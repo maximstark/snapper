@@ -1,0 +1,7 @@
+{
+  "name": "@snapper/skill",
+  "version": "1.0.0",
+  "description": "The snapper Claude skill: triage a Snapper playtest session.",
+  "license": "MIT",
+  "private": true
+}

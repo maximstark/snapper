@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Snapper Three.js demo</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    #screen { display: block; position: absolute; image-rendering: pixelated; }
+    #hud { position: absolute; left: 6px; top: 4px; color: #fff; font: 12px monospace; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <canvas id="screen" width="320" height="180"></canvas>
+  <div id="hud"></div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

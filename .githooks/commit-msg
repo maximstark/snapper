@@ -1,0 +1,3 @@
+#!/bin/sh
+# Public-repo guard on the commit message (scripts/check-public.mjs).
+exec node scripts/check-public.mjs --msg "$1"

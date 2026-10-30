@@ -1,0 +1,11 @@
+[
+  { "wait": 2500 },
+  { "keys": ["KeyD", "Space"], "hold": 700 },
+  { "keys": ["KeyD"], "hold": 500 },
+  { "key": "Space", "ms": 120 },
+  { "wait": 300 },
+  { "mark": "smoke mark" },
+  { "wait": 300 },
+  { "expect": { "marksAtLeast": 1, "ready": { "sdk": true, "state": true, "frame": true, "stepper": true } } },
+  { "end": true }
+]

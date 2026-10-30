@@ -1,0 +1,8 @@
+[
+  { "wait": 2500 },
+  { "mark": "passive 1" },
+  { "wait": 600 },
+  { "mark": "passive 2" },
+  { "wait": 300 },
+  { "end": true }
+]

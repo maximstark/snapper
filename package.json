@@ -1,0 +1,77 @@
+{
+  "name": "snapper",
+  "version": "1.4.1",
+  "private": true,
+  "description": "Playtest capture for AI-built games.",
+  "author": "Maxim Stark",
+  "license": "MIT",
+  "type": "module",
+  "main": "packages/host/main/entry.mjs",
+  "workspaces": [
+    "packages/*"
+  ],
+  "bin": {
+    "snapper": "packages/host/bin/snapper.mjs"
+  },
+  "scripts": {
+    "test": "node --test \"tests/unit/**/*.test.mjs\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/**/*.test.mjs\"",
+    "demo": "node bin/snapper.mjs play examples/demo",
+    "moonflex": "node bin/snapper.mjs play C:/Coding/moonflexforceabilities-v3 --preset ultrawide --fullscreen",
+    "launcher": "electron packages/host/main/entry.mjs",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir",
+    "verify:demo": "node scripts/verify-demo.mjs",
+    "verify:moonflex": "node scripts/verify-moonflex.mjs",
+    "verify:exe": "node scripts/verify-exe.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "build": {
+    "appId": "com.maximstark.snapper",
+    "productName": "Snapper",
+    "directories": {
+      "output": "dist"
+    },
+    "electronDist": "node_modules/electron/dist",
+    "files": [
+      "packages/**",
+      "bin/**",
+      "examples/**",
+      "package.json",
+      "!**/node_modules/**",
+      "!**/*.test.mjs",
+      "!sessions/**",
+      "!docs/**",
+      "!tests/**",
+      "!scripts/**",
+      "!**/.snapper/**",
+      "!private/**"
+    ],
+    "extraFiles": [
+      {
+        "from": "build/snapper.cmd",
+        "to": "snapper.cmd"
+      }
+    ],
+    "asar": false,
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    }
+  }
+}

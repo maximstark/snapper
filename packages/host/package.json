@@ -1,0 +1,15 @@
+{
+  "name": "@snapper/host",
+  "version": "1.4.1",
+  "description": "Snapper host: Electron play shell, CDP capture, overlay, marks, smoke runner, replay runner and CLI.",
+  "type": "module",
+  "bin": {
+    "snapper": "bin/snapper.mjs"
+  },
+  "dependencies": {
+    "@snapper/core": "1.0.0",
+    "@snapper/sdk": "1.0.0"
+  },
+  "license": "MIT",
+  "private": true
+}

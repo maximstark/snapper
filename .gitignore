@@ -1,0 +1,8 @@
+node_modules/
+sessions/
+.snapper/
+*.log
+.DS_Store
+Thumbs.db
+dist/
+private/

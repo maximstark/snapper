@@ -1,0 +1,15 @@
+{
+  "name": "@snapper/mcp",
+  "version": "1.4.0",
+  "description": "Snapper MCP server: playtest sessions, marks, images, replay and regression check over stdio. Zero dependencies.",
+  "type": "module",
+  "main": "server.mjs",
+  "exports": {
+    ".": "./server.mjs"
+  },
+  "bin": {
+    "snapper-mcp": "server.mjs"
+  },
+  "license": "MIT",
+  "private": true
+}

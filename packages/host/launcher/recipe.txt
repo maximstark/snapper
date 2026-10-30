@@ -1,0 +1,10 @@
+// at boot, once:
+const sn = globalThis.snapper;
+if (sn) {
+  sn.registerState(() => ({ scene: sceneName, level: level.id, frame: loop.frame, player: { x, y, vx, vy, pose }, perf: loop.stats }));
+  sn.registerFrame(() => display.finalDataURL());
+  sn.registerStepper({ pause: loop.stop, resume: loop.start, step: debug.step, frame: () => loop.frame, keymap: KEYMAP, pauseParam: "paused" });
+}
+const tick = sn ? sn.tick : () => {};
+// in the fixed update, after input.update():
+tick(loop.frame, maskOf(input));   // maskOf loops a fixed action list into an int; no allocation

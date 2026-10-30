@@ -1,0 +1,14 @@
+{
+  "name": "@snapper/sdk",
+  "version": "1.0.0",
+  "description": "window.snapper: the game-side Snapper SDK. One injectable classic script, no dependencies.",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./snapper.js": "./snapper.js",
+    "./repro-driver.js": "./repro-driver.js"
+  },
+  "license": "MIT",
+  "private": true
+}

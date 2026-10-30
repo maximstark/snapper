@@ -1,0 +1,7 @@
+[
+  { "wait": 2200 },
+  { "keys": ["KeyD", "Space"], "hold": 500 },
+  { "mark": "attach e2e" },
+  { "wait": 300 },
+  { "end": true }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>host-page</title>
+<style>html,body{margin:0;height:100%;background:#3060a0;overflow:hidden}canvas{display:block;width:100%;height:100%}</style>
+<canvas id="c" width="640" height="360"></canvas>
+<script>
+// Plain canvas page for the host e2e test: no SDK. The top-right strip is flat #3060a0 so a test can
+// prove the overlay chip is absent from shot.png; every keydown is logged so a test can prove the
+// game never sees the note box typing. E = console.error, X = uncaught exception.
+const cv = document.getElementById("c"), g = cv.getContext("2d");
+let n = 0;
+function draw() {
+  n++;
+  g.fillStyle = "#3060a0"; g.fillRect(0, 0, 640, 360);
+  g.fillStyle = "#e0a040"; g.fillRect(40 + (n * 3) % 400, 120 + 60 * Math.sin(n / 20), 60, 60);
+  g.fillStyle = "#fff"; g.font = "16px monospace"; g.fillText("host-page frame " + n, 12, 340);
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+addEventListener("keydown", e => {
+  if (e.repeat) return;
+  console.info("keydown " + e.code);
+  if (e.code === "KeyE") console.error("host-page: deliberate console.error");
+  if (e.code === "KeyX") setTimeout(() => { throw new Error("host-page: deliberate exception"); }, 0);
+});
+</script>

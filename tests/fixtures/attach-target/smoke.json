@@ -1,0 +1,21 @@
+[
+  { "wait": 2500 },
+  { "down": "KeyD" },
+  { "wait": 250 },
+  { "key": "Space", "ms": 100 },
+  { "wait": 450 },
+  { "mark": "attach smoke 1" },
+  { "wait": 500 },
+  { "mark": "attach smoke 2" },
+  { "wait": 500 },
+  { "mark": "attach smoke 3" },
+  { "wait": 300 },
+  { "up": "KeyD" },
+  { "wait": 300 },
+  { "key": "F8" },
+  { "wait": 600 },
+  { "type": "found a bug" },
+  { "key": "Enter" },
+  { "wait": 500 },
+  { "end": true }
+]
