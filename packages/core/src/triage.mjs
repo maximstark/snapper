@@ -112,7 +112,7 @@ export function triageSummary(marks) {
   return [...TRIAGE_STATUSES, "untriaged"].filter(s => c[s]).map(s => `${c[s]} ${s}`).join(" · ");
 }
 
-/** Pure: the one-line description of a triage document: `fixed by maxim 2026-10-22 · commit abc1234 · "note" · issue <url>`. */
+/** Pure: the one-line description of a triage document: `fixed by ada 2026-10-22 · commit abc1234 · "note" · issue <url>`. */
 export function triageLine(doc) {
   if (!doc) return null;
   const parts = [`${doc.status}${doc.of ? ` of ${doc.of}` : ""} by ${doc.by}${doc.at ? ` ${String(doc.at).slice(0, 10)}` : ""}`];

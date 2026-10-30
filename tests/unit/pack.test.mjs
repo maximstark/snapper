@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { tmpdir, userInfo } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { readZip, readZipEntry, SNAPPER_VERSION } from "../../packages/core/index.mjs";
@@ -62,7 +62,7 @@ test("compileGlob / ignoreMatcher: * ** ? trailing slash, anchoring, comments", 
 test("packKit: layout, excludes, .snapperignore, config fields, CRLF text files", async () => {
   const root = await gameRoot();
   const out = join(await tmp(), "kit.zip");
-  const r = await packKit(root, { out, developer: "Maxim" });
+  const r = await packKit(root, { out, developer: "Ada" });
   assert.equal(r.file, out);
   assert.equal(r.bundled, false);
   assert.equal(r.slug, "my-game");
@@ -77,7 +77,7 @@ test("packKit: layout, excludes, .snapperignore, config fields, CRLF text files"
   assert.equal(cfg.preset, "deck");
   assert.equal(cfg.hotkeys.mark, "F4");
   assert.equal(cfg.hotkeys.overlay, "F9", "effective config: defaults merged");
-  assert.equal(cfg.developer, "Maxim");
+  assert.equal(cfg.developer, "Ada");
   assert.equal(cfg.tester, true);
   assert.equal(cfg.out, undefined, "the developer's out folder does not ship");
   assert.equal(cfg.discordWebhook, undefined, "a webhook never ships");
@@ -105,7 +105,7 @@ test("packKit: pack.sha comes from the game's git (a repo subfolder here), null 
   const cfg2 = JSON.parse(await text(out2, "snapper.config.json"));
   // (a temp folder is not in a git work tree)
   assert.equal(cfg2.pack.sha, null);
-  assert.equal(cfg2.developer, userInfo().username, "developer defaults to the OS user");
+  assert.equal(cfg2.developer, "the developer", "developer defaults to a neutral label, never the OS user");
 });
 
 test("packKit: default name <slug>-playtest-<yyyymmdd>.zip in the cwd; never zips the output into itself", async () => {
@@ -140,13 +140,13 @@ test("PLAY.cmd: installed Snapper, or README; --url form; --bundle form", () => 
 });
 
 test("README-TESTER.txt: what it is, install line (homepage or placeholder), PLAY.cmd, the mark key, outbox, nothing uploaded", () => {
-  const t = readmeTester({ developer: "Maxim", slug: "my-game", markKey: "F4" });
-  assert.match(t, /Download Snapper: \(link to come — ask Maxim\)/);
+  const t = readmeTester({ developer: "Ada", slug: "my-game", markKey: "F4" });
+  assert.match(t, /Download Snapper: \(link to come — ask Ada\)/);
   assert.match(t, /PLAY\.cmd/);
   assert.match(t, /type your name once/i);
   assert.match(t, /press F4/);
   assert.match(t, /outbox/);
-  assert.match(t, /send the \.zip file inside to Maxim/);
+  assert.match(t, /send the \.zip file inside to Ada/);
   assert.match(t, /Nothing is uploaded/);
   assert.match(readmeTester({ developer: "M", slug: "g", homepage: "https://snapper.example" }), /Download Snapper: https:\/\/snapper\.example/);
   const b = readmeTester({ developer: "M", slug: "g", bundled: true });

@@ -1,9 +1,15 @@
 {
   "name": "snapper",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
-  "description": "Playtest capture for AI-built games.",
-  "author": "Maxim Stark",
+  "description": "Playtest capture for web games.",
+  "author": "Maxim Starkweather",
+  "homepage": "https://maximstark.art/snapper/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximstark/snapper.git"
+  },
+  "bugs": "https://github.com/maximstark/snapper/issues",
   "license": "MIT",
   "type": "module",
   "main": "packages/host/main/entry.mjs",
@@ -17,12 +23,10 @@
     "test": "node --test \"tests/unit/**/*.test.mjs\"",
     "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/**/*.test.mjs\"",
     "demo": "node bin/snapper.mjs play examples/demo",
-    "moonflex": "node bin/snapper.mjs play C:/Coding/moonflexforceabilities-v3 --preset ultrawide --fullscreen",
     "launcher": "electron packages/host/main/entry.mjs",
     "dist": "electron-builder --win",
     "dist:dir": "electron-builder --win --dir",
     "verify:demo": "node scripts/verify-demo.mjs",
-    "verify:moonflex": "node scripts/verify-moonflex.mjs",
     "verify:exe": "node scripts/verify-exe.mjs"
   },
   "devDependencies": {
@@ -30,7 +34,7 @@
     "electron-builder": "26.15.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "build": {
     "appId": "com.maximstark.snapper",
@@ -57,6 +61,14 @@
       {
         "from": "build/snapper.cmd",
         "to": "snapper.cmd"
+      },
+      {
+        "from": "build/README.txt",
+        "to": "README.txt"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE.txt"
       }
     ],
     "asar": false,

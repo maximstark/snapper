@@ -14,21 +14,21 @@ const json = async p => JSON.parse(await readFile(p, "utf8"));
 
 test("triage fixed: prints the line, writes triage.json, SESSION.md shows the Triage lines and counts, SESSION.html too", async () => {
   const dir = await makeSession(await tmp());
-  const r = snapper("triage", dir, "1", "fixed", "--by", "maxim", "--commit", "00e9b48", "--note", "z5 check");
+  const r = snapper("triage", dir, "1", "fixed", "--by", "ada", "--commit", "00e9b48", "--note", "z5 check");
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /^0001: fixed by maxim \d{4}-\d{2}-\d{2} · commit 00e9b48 · "z5 check"\n$/);
+  assert.match(r.stdout, /^0001: fixed by ada \d{4}-\d{2}-\d{2} · commit 00e9b48 · "z5 check"\n$/);
   const doc = await json(join(dir, "marks", "0001", "triage.json"));
   assert.equal(doc.status, "fixed");
-  assert.equal(doc.by, "maxim");
+  assert.equal(doc.by, "ada");
   assert.equal(doc.commit, "00e9b48");
   assert.equal(doc.note, "z5 check");
   const md = await readFile(join(dir, "SESSION.md"), "utf8");
   assert.match(md, /^Triage: 1 fixed · 1 untriaged$/m, "header counts");
-  assert.match(md, /^Triage: fixed by maxim .* commit 00e9b48 · "z5 check"$/m, "per-mark line");
+  assert.match(md, /^Triage: fixed by ada .* commit 00e9b48 · "z5 check"$/m, "per-mark line");
   const html = await readFile(join(dir, "SESSION.html"), "utf8");
-  assert.match(html, /Triage: fixed by maxim/);
+  assert.match(html, /Triage: fixed by ada/);
   // a second call rewrites (open again), keeps nothing stale
-  const r2 = snapper("triage", dir, "0001", "open", "--by", "maxim");
+  const r2 = snapper("triage", dir, "0001", "open", "--by", "ada");
   assert.equal(r2.status, 0, r2.stderr);
   assert.equal((await json(join(dir, "marks", "0001", "triage.json"))).status, "open");
 });

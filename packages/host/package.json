@@ -1,6 +1,6 @@
 {
   "name": "@snapper/host",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Snapper host: Electron play shell, CDP capture, overlay, marks, smoke runner, replay runner and CLI.",
   "type": "module",
   "bin": {

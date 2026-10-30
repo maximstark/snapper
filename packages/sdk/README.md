@@ -1,6 +1,6 @@
 # @snapper/sdk
 
-`window.snapper`: the game-side half of Snapper, playtest capture for AI-built games. One classic script (`snapper.js`), no dependencies, no build step. MIT.
+`window.snapper`: the game-side half of Snapper, playtest capture for web games. One classic script (`snapper.js`), no dependencies, no build step. MIT.
 
 Under the Snapper host it is injected before your game runs and talks to the host over a bridge. Without a host it is a set of cheap no-ops that keep a small in-memory ring; `snapper.export()` returns it. A game must behave identically with and without it, and the SDK never throws into the game.
 

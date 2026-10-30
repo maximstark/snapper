@@ -29,8 +29,8 @@ test("diffPaths: up to three paths, depth-first in key order; [0] is firstDiff; 
 test("triage: statuses, validation, merge rules", () => {
   assert.deepEqual([...TRIAGE_STATUSES], ["open", "fixed", "wontfix", "duplicate", "cannot-reproduce"]);
   const at = "2026-10-22T10:00:00.000Z";
-  const a = nextTriage(null, { status: "open", by: "maxim", at, note: "seen it" });
-  assert.deepEqual(a, { status: "open", by: "maxim", at, note: "seen it" });
+  const a = nextTriage(null, { status: "open", by: "ada", at, note: "seen it" });
+  assert.deepEqual(a, { status: "open", by: "ada", at, note: "seen it" });
   const b = nextTriage({ ...a, issue: "https://github.com/x/y/issues/1" }, { status: "fixed", by: "claude", commit: "abc1234", at });
   assert.deepEqual(b, { status: "fixed", by: "claude", at, issue: "https://github.com/x/y/issues/1", commit: "abc1234" }, "issue carries over, note does not (status changed)");
   const c = nextTriage(b, { by: "claude", at });
@@ -74,21 +74,21 @@ test("writeTriage: writes marks/NNNN/triage.json atomically, refuses bad marks; 
     const r = await writeTriage(d, "1", { status: "fixed", by: "claude", commit: "deadbeef", note: "off by one" });
     assert.equal(r.path, join(d, "marks", "0001", "triage.json"));
     assert.equal((await readTriage(d, "0001")).status, "fixed");
-    await writeTriage(d, "2", { status: "duplicate", of: "1", by: "maxim" });
+    await writeTriage(d, "2", { status: "duplicate", of: "1", by: "ada" });
     assert.equal((await readTriage(d, "0002")).of, "0001");
     assert.equal(readFileSync(join(d, "session.jsonl"), "utf8"), before);
     const md = renderSessionMd(await readSession(d));
     assert.match(md, /^Triage: 1 fixed · 1 duplicate$/m);
     assert.match(md, /^Triage: fixed by claude \d{4}-\d\d-\d\d · commit deadbeef · "off by one"$/m);
-    assert.match(md, /^Triage: duplicate of 0001 by maxim/m);
+    assert.match(md, /^Triage: duplicate of 0001 by ada/m);
     assert.match(md.split("\n")[1], /tester: Ana/);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
-test("detectIntegration: Moonflex-shaped, demo-shaped and un-integrated fixtures", () => {
+test("detectIntegration: Dev-module-shaped, demo-shaped and un-integrated fixtures", () => {
   const d = tmp();
   try {
-    // Moonflex-shaped: src/dev/snapper.js registers; src/main.js imports it and runs the loop
+    // Dev-module-shaped: src/dev/snapper.js registers; src/main.js imports it and runs the loop
     const mf = join(d, "mf");
     mkdirSync(join(mf, "src", "dev"), { recursive: true });
     mkdirSync(join(mf, "node_modules", "lib"), { recursive: true });

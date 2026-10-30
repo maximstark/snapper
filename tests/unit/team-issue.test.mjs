@@ -42,7 +42,7 @@ test("issue --markdown (default): writes marks/NNNN/issue.md = # title + body, p
   assert.equal(r.status, 0, r.stderr);
   const md = await readFile(join(dir, "marks", "0001", "issue.md"), "utf8");
   assert.equal(r.stdout, md);
-  assert.ok(md.startsWith("# swan clips through the sluice — demo-game 2026-10-18T14-02-11 mark 0001\n\n## What was seen"));
+  assert.ok(md.startsWith("# pigeon clips through the ledge — demo-game 2026-10-18T14-02-11 mark 0001\n\n## What was seen"));
   const t = await snapperAsync(["issue", dir, "0001", "--markdown", "--title", "My own title"]);
   assert.equal(t.status, 0, t.stderr);
   assert.ok((await readFile(join(dir, "marks", "0001", "issue.md"), "utf8")).startsWith("# My own title\n\n"));

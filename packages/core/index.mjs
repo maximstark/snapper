@@ -28,5 +28,5 @@ export {
 export { crc32, writeZip, zipDir, listTree, readZip, readZipEntry, extractZip, safeEntryName } from "./src/zip.mjs";
 export { detectIntegration, lastSdkSeen, integrationLine, snapperCalls, moduleScripts } from "./src/integration.mjs";
 
-export const SNAPPER_VERSION = "1.4.1";
+export const SNAPPER_VERSION = "1.4.2";
 export const FORMAT_VERSION = 1;

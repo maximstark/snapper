@@ -55,9 +55,9 @@ test("outbox name, key label, hint and line texts", () => {
   assert.equal(testerHint("F8"), "F8 marks a moment");
   assert.equal(testerHint("KeyM"), "M marks a moment");
   assert.equal(TESTER_NOTE_TITLE, "What happened?");
-  assert.equal(testerNameTitle("Maxim"), "Your name (sent with your sessions to Maxim)");
+  assert.equal(testerNameTitle("Ada"), "Your name (sent with your sessions to Ada)");
   assert.equal(testerNameTitle(""), "Your name (sent with your sessions to the developer)");
-  assert.equal(sendLine("Maxim", "outbox/demo-2026.zip"), "Send this file to Maxim: outbox\\demo-2026.zip");
+  assert.equal(sendLine("Ada", "outbox/demo-2026.zip"), "Send this file to Ada: outbox\\demo-2026.zip");
   assert.equal(sendLine(undefined, "outbox\\a.zip"), "Send this file to the developer: outbox\\a.zip");
 });
 
@@ -126,10 +126,10 @@ function boot(opts = {}) {
 
 test("page: the name prompt is an input like the note box; its keys never reach the game", async () => {
   const h = boot({});
-  await h.msg("name", { title: "Your name (sent with your sessions to Maxim)" });
+  await h.msg("name", { title: "Your name (sent with your sessions to Ada)" });
   const { note, label, input } = h.els();
   assert.equal(note.style.display, "block");
-  assert.equal(label.textContent, "Your name (sent with your sessions to Maxim)");
+  assert.equal(label.textContent, "Your name (sent with your sessions to Ada)");
   assert.match(input.placeholder, /Enter saves, Esc skips/);
   for (const c of ["KeyA", "KeyN", "KeyN"]) {
     const d = h.key("keydown", c), u = h.key("keyup", c);

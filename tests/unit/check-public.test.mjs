@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkFile } from "../../scripts/check-public.mjs";
+import { checkFile, denylist } from "../../scripts/check-public.mjs";
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const why = (path, text, opts) => checkFile(path, text == null ? null : Buffer.from(text), opts).map(p => p.why);
@@ -17,6 +17,10 @@ test("check-public: user-profile and home paths are flagged, placeholders are no
   assert.deepEqual(why("a.md", "see %LOCALAPPDATA%\\Programs\\Snapper"), []);
   assert.deepEqual(why("a.md", "path /ho" + "me/alice/x"), ["a home-folder path"]);
   assert.deepEqual(why("a.md", "path /home/<user>/x"), []);
+  assert.deepEqual(why("a.md", "wsl sees /mnt/c/Us" + "ers/bob/x"), ["a Windows user-profile path"]);
+  assert.deepEqual(why("a.md", "wsl sees /mnt/c/Users/<you>/x"), []);
+  assert.deepEqual(why("a.md", "share \\\\wsl.localhost\\Ubuntu\\ho" + "me\\bob\\x"), ["a home-folder path"]);
+  assert.deepEqual(why("a.md", "share \\\\wsl$\\Ubuntu\\home\\<user>\\x"), []);
 });
 
 test("check-public: email addresses are flagged except the allowed ones", () => {
@@ -36,14 +40,17 @@ test("check-public: private paths, internal notes and sessions are refused by pa
 
 test("check-public: secrets, session links and deny-list terms; vendor code is not scanned", () => {
   assert.deepEqual(why("a.js", "const k = 'sk-" + "ant-abcdefghijklmnop'"), ["a secret"]);
+  assert.deepEqual(why("a.js", "https://discord.com/api/web" + "hooks/123/abc"), ["a secret"]);
+  assert.deepEqual(why("a.js", "https://discord.example/api/webhooks/123/abc"), []);
   assert.deepEqual(why("a.md", "https://claude.ai/code/" + "session_0147abc"), ["a private Claude session link"]);
   assert.deepEqual(why("commit message", "Claude-Session: https://claude.ai/code/" + "session_0147abc", { msg: true }), []);
   assert.deepEqual(why("a.md", "a Secret Word here", { terms: ["secret word"] }), ["a term on the private deny list"]);
   assert.deepEqual(why("examples/x/vendor/lib.js", "bob@" + "gmail.com"), []);
 });
 
-test("check-public: every tracked file in this repo passes", () => {
+test("check-public: every tracked file in this repo passes (with the private deny list when it exists)", () => {
+  const terms = denylist();
   const files = execFileSync("git", ["ls-files"], { cwd: REPO }).toString().split("\n").filter(Boolean);
-  const hits = files.flatMap(f => { try { return checkFile(f, readFileSync(join(REPO, f))); } catch { return checkFile(f, null); } });
+  const hits = files.flatMap(f => { try { return checkFile(f, readFileSync(join(REPO, f)), { terms }); } catch { return checkFile(f, null); } });
   assert.deepEqual(hits, []);
 });

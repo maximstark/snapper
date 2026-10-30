@@ -24,7 +24,7 @@ test("activity: gaps count up to IDLE_MS, the start counts, the tail counts up t
   assert.equal(activeTotal(a, 10_000_000), 2000 + 3000 + 60000 + 60000);
   assert.equal(activeMsOf([], 5000), 5000, "a short session with no input counts whole");
   assert.equal(activeMsOf([], 3_600_000), 60000, "an hour left alone counts one minute");
-  // Maxim's 2026-10-25 session: inputs between 2.8 s and 18.0 s, end at 42,216 s
+  // a real session: inputs between 2.8 s and 18.0 s, end at 42,216 s
   assert.equal(activeMsOf([2777.7, 15910.9, 17931, 18018.8], 42216039.3), 78018.8);
 });
 

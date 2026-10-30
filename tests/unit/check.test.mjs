@@ -200,7 +200,7 @@ test("planCheck: no stepper and no frame lines skip, never error; finishCheck wr
     assert.ok(out.rows.every(r => !("_ord" in r)));
     const doc = JSON.parse(await readFile(out.checkFile, "utf8"));
     assert.equal(doc.v, 1);
-    assert.equal(doc.host, "1.4.1");
+    assert.equal(doc.host, "1.4.2");
     assert.equal(doc.root, g.root);
     assert.equal(doc.summary.total, 2);
     assert.equal(doc.rows.length, 2);

@@ -1,8 +1,10 @@
 # Snapper
 
-Playtest capture for web games. Play your HTML/JS game, press **F8** when something looks wrong and type what you saw. Snapper saves the screen, the seconds before it, the game's state, your inputs, the console and the frame pacing into one plain-files report that you, your team or your AI coding agent (Claude Code, Cursor, Windsurf, Codex) can act on. If your game has a fixed-step loop, it replays the session to the exact frame of the mark, so a fix can be proven.
+Playtest capture for web games. Play your HTML/JS game, press **F8** when something looks wrong and type what you saw. Snapper saves the screen, the seconds before it, the game's state, your inputs, the console and the frame pacing into one report of plain files (Markdown, JSON, PNG) that you, your team or your AI coding agent (Claude Code, Cursor, Windsurf, Codex) can act on. If your game has a fixed-step loop, it replays the session to the exact frame of the mark, so a fix can be proven.
 
 Windows, 64-bit. Free and open source under the [MIT licence](LICENSE). Get the ready-made installer on itch.io (pay what you want), or build it from this repo.
+
+**Install:** [Snapper on itch.io](ITCH_URL) <!-- ITCH_URL: set on launch day -->: Windows installer or portable zip, unsigned (SmartScreen warns once; More info → Run anyway). Product page: [maximstark.art/snapper](https://maximstark.art/snapper/).
 
 - `docs/SESSION_FORMAT.md` — the engine-neutral session folder
 - `docs/SDK.md` — the `window.snapper` contract (about 10 lines in your game for state, about 40 for replay)
@@ -23,7 +25,7 @@ Mark a moment with F8, or hold Back+Start on the gamepad (standard-mapping butto
 
 Save states: F6 saves one, and closing the window (or Ctrl+C) always saves `exit`. `npx snapper play <game> --resume last` replays that run to where you stopped and hands it back; `--at 0002`, `--at mark-0003` or `--at f12345` pick another point. The restore replays the tape on the current code, so it lands exactly only when the code has not changed (the toast says ✓ or DIFFERS).
 
-## Executable (v1.2)
+## Executable
 
 Snapper also builds as a self-contained Windows application: no Node, no repo, no browser download.
 
@@ -34,11 +36,11 @@ npm run launcher    # the launcher window from the repo (dev)
 ```
 
 - `Snapper.exe` with no arguments opens the launcher: pick the game folder, preset, fullscreen and query, Play; the game's sessions are listed below with Resume, Replay, Open folder and SESSION.md. Each action shows the equivalent `snapper …` command.
-- `snapper.cmd`, next to `Snapper.exe` (install dir, `dist/win-unpacked/`, or the unzipped folder), is the same CLI as `node bin/snapper.mjs`: `snapper.cmd replay "<session-dir>" 0001`, `snapper.cmd list <game-root>`, `snapper.cmd doctor` (`packaged yes`). This is the path for Claude.
+- `snapper.cmd`, next to `Snapper.exe` (install dir, `dist/win-unpacked/`, or the unzipped folder), is the same CLI as `node bin/snapper.mjs`: `snapper.cmd replay "<session-dir>" 0001`, `snapper.cmd list <game-root>`, `snapper.cmd doctor` (`packaged yes`). This is the path the Claude Code skill and the MCP server call.
 - Replay runs on Electron's own Chromium, the same engine as the play window.
 - The build is **unsigned** for now, so Windows SmartScreen says "Windows protected your PC" on first run: click **More info**, then **Run anyway**.
 
-## The launcher (v1.3)
+## The launcher
 
 - **Demos** + **Try**: play a bundled example (the plain demo, Phaser, PixiJS, Three.js) with no game of your own. Its sessions go to `%APPDATA%\Snapper\demo-sessions\<slug>\`, never into the install folder, and show in the Sessions list.
 - **Set up this game for Claude**: installs the snapper skill into `<game>\.claude\skills\snapper\` (nothing else is written into the game) and shows the SDK integration recipe with a Copy button.
@@ -48,7 +50,7 @@ npm run launcher    # the launcher window from the repo (dev)
 - **Check**: runs `snapper check <game> --sessions 3` and shows one row per mark; a differing row has Accept (with a confirm line) for when the new behaviour is right.
 - Mark pickers show the note: `0003 · 1:02.3 · hotkey · "jumped through the floor"`. Drop a folder on the window to pick it.
 
-v1.4 adds to the launcher:
+Also in the launcher:
 
 - **Set up for Claude** now looks at the game first. A game that already calls the SDK gets "This game already talks to Snapper: `src/dev/snapper.js` (registerState, registerFrame, registerStepper, tick). Nothing to paste." plus what its last session saw; any other game gets "Paste this into the file that starts your game loop" with the likely files, labelled as guesses. `snapper doctor <game>` prints the same finding.
 - **Attach** row: endpoint (default `http://127.0.0.1:9222`), a page picker when several tabs are open, Attach / Detach (see Attach mode below).
@@ -69,23 +71,38 @@ Replays every replayable mark of past sessions on the current code and compares 
 
 ## Engines
 
-Any HTML/JS game runs under Snapper with no changes (shots, the lead-up sheet, inputs, console, errors, frame pacing, notes, auto-marks); the SDK adds state and the game's own frame, and a fixed-step stepper adds replay, resume and `check` (`docs/SDK.md`). Tested demos, each played, marked and replayed by `scripts/verify-engines.mjs`: plain canvas (`examples/demo`), Phaser 4.2.1 (`examples/phaser`), PixiJS 8.22.0 (`examples/pixi`), Three.js 0.186.1 (`examples/three`); versions and sizes in `examples/VENDOR.md`.
+Any HTML/JS game runs under Snapper with no changes (shots, the lead-up sheet, inputs (keys and gamepad; the mouse counts as activity only, so a mouse-driven game gets no input record or replay), console, errors, frame pacing, notes, auto-marks); the SDK adds state and the game's own frame, and a fixed-step stepper adds replay, resume and `check` (`docs/SDK.md`). Tested demos, each played, marked and replayed by `scripts/verify-engines.mjs`: plain canvas (`examples/demo`), Phaser 4.2.1 (`examples/phaser`), PixiJS 8.22.0 (`examples/pixi`), Three.js 0.186.1 (`examples/three`); versions and sizes in `examples/VENDOR.md`.
 
 - **Godot 4 web exports** need `SharedArrayBuffer`, so play them with `--coi` (or `"crossOriginIsolated": true` in `snapper.config.json`): the static server then sends `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. It is off by default because `require-corp` blocks cross-origin assets that lack CORP headers. Not yet tested with a real Godot export.
 - **Unity WebGL**: expected to work, untested.
 
 ## MCP server
 
-`snapper mcp` serves the sessions as MCP tools over stdio (`list_sessions`, `read_session`, `read_mark`, `mark_image`, `replay`, `check`; v1.4: `set_triage`, `issue_markdown`, `import_session`, `export_repro`) for Claude Code, Cursor, Windsurf or Codex. It is optional: the session files are the truth.
+`snapper mcp` serves the sessions as MCP tools over stdio (`list_sessions`, `read_session`, `read_mark`, `mark_image`, `replay`, `check`, `set_triage`, `issue_markdown`, `import_session`, `export_repro`) for Claude Code and any other MCP client (tested with Claude Code). It is optional: the session files are the truth.
 
 ```
 claude mcp add snapper -- "%LOCALAPPDATA%\Programs\Snapper\snapper.cmd" mcp
 claude mcp add snapper -- node <repo>/packages/mcp/server.mjs --cli "node <repo>/bin/snapper.mjs"
 ```
 
+For Cursor, Windsurf or another client that takes the generic `mcpServers` JSON (untested; `<you>` is your Windows user name, and a `.cmd` file runs through `cmd /c`):
+
+```json
+{
+  "mcpServers": {
+    "snapper": {
+      "command": "cmd",
+      "args": ["/c", "C:\\Users\\<you>\\AppData\\Local\\Programs\\Snapper\\snapper.cmd", "mcp"]
+    }
+  }
+}
+```
+
+From a repo checkout: `"command": "node"`, `"args": ["<repo>/packages/mcp/server.mjs", "--cli", "node <repo>/bin/snapper.mjs"]`.
+
 `packages/mcp` is MIT with no dependencies; it speaks MCP 2026-07-28 (per-request metadata, `server/discover`) and the `initialize` handshake of 2025-11-25 and earlier.
 
-## Attach mode (v1.4)
+## Attach mode
 
 `snapper attach` captures a game running in a browser you started yourself (Chrome, Edge, or the game's own Electron or NW.js shell) instead of in Snapper's window. Same session folder, same skill.
 
@@ -105,7 +122,7 @@ claude mcp add snapper -- node <repo>/packages/mcp/server.mjs --cli "node <repo>
 
 What it captures: the shot (`Page.captureScreenshot`, the page at its own size), the lead-up sheet, console and exceptions, frame pacing, keys and gamepads, notes; with the SDK registered also state, the game's frame and replay. By default Snapper **reloads the page once** after injecting, so the game boots with the SDK present and registers its state and stepper; the tape starts at that boot and marks are replayable when `--game-root` (or an http(s) URL `replay` can revisit) is known. `--no-reload` leaves the page as it is: passive capture only, no mark is replayable, and `SESSION.md` says so. Without `--game-root` sessions go to `%APPDATA%\Snapper\attach-sessions\<slug>\`. Snapper changes no flags in your browser; `docs/TRUST.md` ("Attach mode") lists what it injects. Firefox and Safari are not supported (no Chrome DevTools Protocol).
 
-## Playtesters (v1.4)
+## Playtesters
 
 Send a friend the game with a mark key, get a session back:
 
@@ -123,13 +140,13 @@ snapper import <zip> --root <game folder>      # or drop the zip on the launcher
 
 validates the zip, unpacks it into `<game>\.snapper\sessions\<slug>\<id>` (never over an existing id) and prints the Copy-for-Claude line. The session shows `from <tester>`; its replay serves your game folder.
 
-## Reports, triage and issues (v1.4)
+## Reports, triage and issues
 
 - **`SESSION.html`** next to `SESSION.md`: a static page (no script, images by relative path) with every mark's note, shot, lead-up sheet, frame, state, errors, replay command and status. Written at session end and by `snapper summary`; the launcher's **Open report** opens it. Zip the session folder and the page travels with it.
 - **Triage**: `snapper triage <session> <mark> open|fixed|wontfix|duplicate|cannot-reproduce [--note "…"] [--by <name>] [--of <mark>] [--commit <sha>]` writes `marks/NNNN/triage.json`; `SESSION.md`, `SESSION.html`, `snapper check` and the launcher's pickers show it. The launcher's replay result has a status select.
 - **Issues**: `snapper issue <session> <mark>` writes `marks/NNNN/issue.md` (title, what was seen, state, environment, errors, inputs, the replay and check commands, file paths) for pasting into any tracker; the launcher's **Copy issue** copies it. `--github` files it with `gh issue create` in the game repo (needs `gh` and a remote; GitHub's API cannot attach images, so the body names `shot.png`) and records the URL in `triage.json`. `--discord <webhook-url>` (or `discordWebhook` in `snapper.config.json`) posts the title, a summary and `shot.png`; the URL is never written into the session.
 
-## No-Snapper repro (v1.4)
+## No-Snapper repro
 
 The strongest answer to "was it Snapper?":
 

@@ -1,4 +1,4 @@
-// Helpers for the gate scripts (verify-demo, verify-moonflex): run the CLI, collect checks, copy evidence.
+// Helpers for the gate scripts (verify-demo, verify-check, verify-trust): run the CLI, collect checks, copy evidence.
 import { spawn } from "node:child_process";
 import { mkdir, copyFile, readFile, access } from "node:fs/promises";
 import { join, dirname } from "node:path";

@@ -13,7 +13,7 @@ if (cmd === "replay") {
   process.stdout.write(`${out}\n`);
 } else if (cmd === "check") {
   const rows = [
-    { session: "2026-10-18T14-02-11", mark: "0001", frame: 2538, trigger: "hotkey", note: "swan clips", result: "match", expectation: "state" },
+    { session: "2026-10-18T14-02-11", mark: "0001", frame: 2538, trigger: "hotkey", note: "pigeon clips", result: "match", expectation: "state" },
     { session: "2026-10-18T14-02-11", mark: "0002", frame: 4201, trigger: "exception", note: "", result: "differs", firstDiff: "$.player.x", expectation: "state" },
   ];
   process.stdout.write("noise before the json line\n");
@@ -22,7 +22,7 @@ if (cmd === "replay") {
 } else if (cmd === "import") {
   // `import <zip> --root <root>`: the fixture session already sits under <root>; print it like the real CLI (v1.4)
   const root = process.argv[process.argv.indexOf("--root") + 1];
-  process.stdout.write(`imported to ${join(root, ".snapper", "sessions", "moonflexforceabilities-v3", "2026-10-18T14-02-11")}\n`);
+  process.stdout.write(`imported to ${join(root, ".snapper", "sessions", "skyhop", "2026-10-18T14-02-11")}\n`);
   process.stdout.write("Read \"…\\SESSION.md\" and triage it with the snapper skill.\n");
 } else if (cmd === "export-repro") {
   const out = join(a, "marks", b, "repro");

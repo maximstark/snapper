@@ -26,15 +26,15 @@ test("buildIssue: title rule, sections, state keys, env line, errors (first 5), 
   const dir = await makeSession(await tmp(), { tester: "Ann" });
   await withInputs(dir);
   const r = await buildIssue(dir, "1");
-  assert.equal(r.title, "swan clips through the sluice — demo-game 2026-10-18T14-02-11 mark 0001");
+  assert.equal(r.title, "pigeon clips through the ledge — demo-game 2026-10-18T14-02-11 mark 0001");
   assert.equal(r.markdown, `# ${r.title}\n\n${r.body}`);
   assert.equal(r.markDir, join(dir, "marks", "0001"));
   const b = r.body;
-  assert.match(b, /- note: swan clips through the sluice/);
+  assert.match(b, /- note: pigeon clips through the ledge/);
   assert.match(b, /- trigger: hotkey · t 0:42\.3 · frame 2538/);
   assert.match(b, /scene=stage level=2-2 .*hearts=3/);
   assert.match(b, /top-level keys: scene, level, player, vel, pose, hearts, perf, entities/);
-  assert.match(b, /Snapper 1\.0\.0 · Windows 11 10\.0\.26300 · GPU test · display 3440×1440 @ 180 Hz dpr 1 · Chromium 146\.0\.7600\.10 · git 024e9ae \(dirty\) · tester Ann/);
+  assert.match(b, /Snapper 1\.0\.0 · Windows 11 10\.0\.26100 · GPU NVIDIA GeForce RTX 4060 \(ANGLE D3D11\) · display 3440×1440 @ 180 Hz dpr 1 · Chromium 146\.0\.7600\.10 · git 024e9ae \(dirty\) · tester Ann/);
   assert.ok(b.includes("- boom 0 second line") && b.includes("- boom 4 second line") && !b.includes("boom 5"), "first five errors only, one line each");
   assert.ok(!b.includes("- fine"), "only error-level entries");
   assert.match(b, /keys pressed in the last seconds: KeyD, Space/);

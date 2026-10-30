@@ -2,7 +2,7 @@
 // `snapper.cmd` from there, with a cwd outside the repo and a PATH stripped of Node and of the repo's node_modules/.bin,
 // so the exe cannot reach into the repo (a bare "@snapper/…" import would resolve through the repo's node_modules,
 // because dist/ sits inside the repo; with the copy elsewhere it fails instead).
-//   node scripts/verify-exe.mjs [--build] [--keep]     (EVIDENCE=1 writes private/evidence/v1.3/x3/, or EVIDENCE_VERSION/x3)
+//   node scripts/verify-exe.mjs [--build] [--keep] [--game <game root> [--query "?level=1"]]     (EVIDENCE=1 writes private/evidence/v1.3/x3/, or EVIDENCE_VERSION/x3)
 //     --build  run `npm run dist:dir` first (otherwise dist/win-unpacked/Snapper.exe must exist)
 //     --keep   keep the temp copy and its sessions
 // Writes sessions/x3/checks.json always.
@@ -17,6 +17,9 @@ import { REPO, checklist, exists, json, EVIDENCE_ON, evidenceDir } from "./lib.m
 const argv = process.argv.slice(2);
 const BUILD = argv.includes("--build");
 const KEEP = argv.includes("--keep");
+const optv = name => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : null);
+const GAME2 = optv("--game");          // optional second game; its section is skipped without it
+const GAME2_QUERY = optv("--query") || "";
 const c = checklist("X3 packaged CLI");
 const fwd = p => p.replace(/\\/g, "/");
 const SRC = join(REPO, "dist", "win-unpacked");
@@ -39,7 +42,7 @@ const TMP = await mkdtemp(join(tmpdir(), `snapper-x3-${stamp}-`));
 const APP = join(TMP, "Snapper");
 const CWD = join(TMP, "cwd");
 const SESS_DEMO = join(TMP, "sessions-demo");
-const SESS_MOON = join(TMP, "sessions-moonflex");
+const SESS_GAME2 = join(TMP, "sessions-game2");
 await cp(SRC, APP, { recursive: true });
 await mkdir(CWD, { recursive: true });
 const CMD = join(APP, "snapper.cmd");
@@ -116,7 +119,7 @@ try {
   // ---- d. --version and doctor
   const ver = await snapperCmd(["--version"], { timeoutMs: 60000 });
   note("--version", ver);
-  c.check("snapper.cmd --version → `snapper 1.4.1`", ver.code === 0 && ver.stdout.trim() === "snapper 1.4.1", `exit ${ver.code} ${JSON.stringify(ver.stdout.trim())}`);
+  c.check("snapper.cmd --version → `snapper 1.4.2`", ver.code === 0 && ver.stdout.trim() === "snapper 1.4.2", `exit ${ver.code} ${JSON.stringify(ver.stdout.trim())}`);
   const doc = await snapperCmd(["doctor"], { timeoutMs: 60000 });
   note("doctor", doc);
   c.check("snapper.cmd doctor exits 0 and says `all ok`", doc.code === 0 && doc.lastLine === "all ok", `exit ${doc.code} last ${JSON.stringify(doc.lastLine)}`);
@@ -138,7 +141,7 @@ try {
     const env = await json(join(demoSession, "env.json"));
     c.check("env.json host.packaged === true", env?.host?.packaged === true, JSON.stringify(env?.host?.packaged));
     c.check("env.json host.exe is the copy's Snapper.exe", typeof env?.host?.exe === "string" && norm(env.host.exe) === norm(exePath), env?.host?.exe);
-    c.check("env.json snapper 1.4.1, format 1", env?.snapper === "1.4.1" && env?.format === 1, `${env?.snapper} format ${env?.format}`);
+    c.check("env.json snapper 1.4.2, format 1", env?.snapper === "1.4.2" && env?.format === 1, `${env?.snapper} format ${env?.format}`);
     demoMarkId = (await readSession(demoSession)).marks[0]?.id ?? "0001";
   } else c.check("demo session folder exists", false, String(demoSession));
 
@@ -283,9 +286,9 @@ try {
     c.check("snapper.cmd doctor <demo> prints the integration line", dr.code === 0 && dr.lines.some(l => /integration: this game already talks to Snapper: game\.js/.test(l)), dr.lines.find(l => /integration/.test(l)) || dr.stdout.slice(-200));
   }
 
-  // ---- h. Moonflex G3 script through the exe, then replay its mark
-  const MOON = "C:/Coding/moonflexforceabilities-v3";
-  if (!existsSync(MOON)) c.check("Moonflex checkout present", false, MOON);
+  // ---- h. second-game script through the exe, then replay its mark (only with --game)
+  if (!GAME2) process.stdout.write("second-game section skipped (no --game <path>)\n");
+  else if (!existsSync(GAME2)) c.check("second game checkout present", false, GAME2);
   else {
     const steps = [{ wait: 2500 }, { down: "KeyD" }];
     for (let i = 0; i < 8; i++) steps.push({ key: "Space", ms: 120 }, { wait: 630 });
@@ -293,10 +296,10 @@ try {
       { expect: { marksAtLeast: 1, ready: { sdk: true, state: true, frame: true, stepper: true } } }, { end: true });
     const script = join(TMP, "g3-smoke.json");
     await writeFile(script, JSON.stringify(steps, null, 2) + "\n");
-    const mp = await snapperCmd(["play", MOON, "--preset", "1080p", "--query", "?scene=stage&level=1-1", "--smoke", script, "--out", SESS_MOON], { timeoutMs: 240000 });
-    note("play moonflex", mp);
-    c.check("moonflex play --smoke exits 0", mp.code === 0, `exit ${mp.code} ${mp.stderr.trim().slice(-300)}`);
-    c.check("moonflex result JSON ok:true", mp.last?.ok === true, mp.lastLine.slice(0, 200));
+    const mp = await snapperCmd(["play", GAME2, "--preset", "1080p", ...(GAME2_QUERY ? ["--query", GAME2_QUERY] : []), "--smoke", script, "--out", SESS_GAME2], { timeoutMs: 240000 });
+    note("play game2", mp);
+    c.check("game2 play --smoke exits 0", mp.code === 0, `exit ${mp.code} ${mp.stderr.trim().slice(-300)}`);
+    c.check("game2 result JSON ok:true", mp.last?.ok === true, mp.lastLine.slice(0, 200));
     const ms = mp.last?.session;
     if (ms && await exists(ms)) {
       const s = await readSession(ms);
@@ -304,16 +307,16 @@ try {
       c.check("a smoke mark exists", !!m, s.marks.map(x => `${x.id}:${x.trigger}`).join(" "));
       if (m) {
         const state = await json(join(ms, ...m.dir.split("/"), "state.json"));
-        c.check('the smoke mark state.json has level "1-1"', state?.level === "1-1", JSON.stringify(state)?.slice(0, 200));
+        c.check("the smoke mark has a state.json", state != null, JSON.stringify(state)?.slice(0, 200));
         const mr = await snapperCmd(["replay", ms, m.id], { timeoutMs: 180000 });
-        note("replay moonflex", mr);
-        c.check(`moonflex replay ${m.id} exits 0`, mr.code === 0, `exit ${mr.code} ${mr.stderr.trim().slice(-300)}`);
+        note("replay game2", mr);
+        c.check(`game2 replay ${m.id} exits 0`, mr.code === 0, `exit ${mr.code} ${mr.stderr.trim().slice(-300)}`);
         const rj = mr.lastLine && await exists(join(mr.lastLine, "replay.json")) ? await json(join(mr.lastLine, "replay.json")) : null;
-        c.check("moonflex replay.json stateMatches true (engine electron, chromium 152.x)",
+        c.check("game2 replay.json stateMatches true (engine electron, chromium 152.x)",
           rj?.stateMatches === true && rj?.engine === "electron" && /^152\./.test(rj?.chromium || ""), `stateMatches ${rj?.stateMatches} engine ${rj?.engine} chromium ${rj?.chromium}`);
-        if (rj) record.moonflexReplay = { stateMatches: rj.stateMatches, engine: rj.engine, chromium: rj.chromium, dpr: rj.dpr };
+        if (rj) record.game2Replay = { stateMatches: rj.stateMatches, engine: rj.engine, chromium: rj.chromium, dpr: rj.dpr };
       }
-    } else c.check("moonflex session folder exists", false, String(ms));
+    } else c.check("game2 session folder exists", false, String(ms));
   }
 
   await writeOutputs(doctorTxt);

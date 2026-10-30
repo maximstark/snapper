@@ -52,17 +52,17 @@ export const TOOLS = [
     description: "Replay a replayable mark deterministically on the current code (snapper replay): returns replay.md, stateMatches, firstDiff and the output folder (marks/NNNN/replay/ with fNNNNNN.png frames). stateMatches false means the replay is NOT trustworthy.",
     inputSchema: { type: "object", properties: {
       session: str("The session folder."), mark: str("The mark id."),
-      query: str("Optional segment query override, e.g. ?scene=stage&level=2-1 (sessions recorded before 1.1.1)."),
+      query: str("Optional segment query override, e.g. ?level=2 (sessions recorded before 1.1.1)."),
     }, required: ["session", "mark"], additionalProperties: false },
   },
   {
     name: "check",
     title: "Regression check",
-    description: "snapper check: replay every replayable mark of the game's past sessions on the current code and compare with each mark's expectation (expected.json, else state.json). A `differs` on a mark you did not touch is a regression. accept=true records the replayed states as the new expectations: only for marks whose new behaviour Maxim confirmed is right, never to make a check pass.",
+    description: "snapper check: replay every replayable mark of the game's past sessions on the current code and compare with each mark's expectation (expected.json, else state.json). A `differs` on a mark you did not touch is a regression. accept=true records the replayed states as the new expectations: only for marks whose new behaviour the developer confirmed is right, never to make a check pass.",
     inputSchema: { type: "object", properties: {
       root: str("The game root folder."),
       sessions: { type: "integer", minimum: 1, description: "Only the newest N sessions (default all)." },
-      accept: { type: "boolean", description: "Write marks/NNNN/expected.json for every checked mark. Only with Maxim's confirmation." },
+      accept: { type: "boolean", description: "Write marks/NNNN/expected.json for every checked mark. Only after the developer confirmed the new behaviour is right." },
       out: str("Optional sessions folder to search instead of the game's (also where check.json goes)."),
     }, required: ["root"], additionalProperties: false },
   },

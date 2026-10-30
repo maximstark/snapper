@@ -44,7 +44,7 @@ test("tester mode: asks the name once, writes tester.json + env tester.name, zip
   const game = join(kit, "game");
   mkdirSync(kit, { recursive: true });
   cpSync(join(ROOT, "examples", "demo"), game, { recursive: true });
-  writeFileSync(join(kit, "snapper.config.json"), JSON.stringify({ developer: "Maxim", tester: true, slug: "demo" }));
+  writeFileSync(join(kit, "snapper.config.json"), JSON.stringify({ developer: "Ada", tester: true, slug: "demo" }));
   writeFileSync(join(tmp, "ask.json"), JSON.stringify(ASK));
   writeFileSync(join(tmp, "noask.json"), JSON.stringify(NO_ASK));
 
@@ -67,7 +67,7 @@ test("tester mode: asks the name once, writes tester.json + env tester.name, zip
   const dir1 = result1.session;
   const env1 = json(join(dir1, "env.json"));
   assert.deepEqual(env1.tester, { name: "Ann" });
-  assert.equal(env1.config.developer, "Maxim");
+  assert.equal(env1.config.developer, "Ada");
   assert.equal(env1.config.tester, true);
   // the name was typed into the overlay: the game never saw those keys
   const tape1 = lines(join(dir1, "tape.jsonl")).filter(l => l.k);

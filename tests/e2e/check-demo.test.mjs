@@ -95,7 +95,7 @@ test("check: a changed copy differs under $.player, --accept makes it match, the
   assert.ok(acc.rows.every(x => x.accepted === true));
   assert.equal(acc.rows.filter(x => x.result === "differs").length, res.summary.differs, "the rows still report the comparison against the OLD expectation");
   const exp = JSON.parse(await readFile(join(sessionDir, "marks", "0001", "expected.json"), "utf8"));
-  assert.equal(exp.host, "1.4.1");
+  assert.equal(exp.host, "1.4.2");
   assert.equal(exp.frame, JSON.parse(await readFile(join(sessionDir, "marks", "0001", "state.json"), "utf8")).frame);
   assert.match(exp.acceptedAt, /^\d{4}-\d{2}-\d{2}T/);
   assert.ok("git" in exp);

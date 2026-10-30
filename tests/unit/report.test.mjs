@@ -56,9 +56,9 @@ test("SESSION.html: a note, state and triage note full of markup are escaped eve
 
 test("SESSION.html: triage line and issue link (http only)", async () => {
   const dir = await makeSession(await tmp());
-  await writeTriage(dir, "0001", { status: "fixed", by: "maxim", commit: "abc1234", note: "n", issue: "https://github.com/example/demo/issues/42" });
+  await writeTriage(dir, "0001", { status: "fixed", by: "ada", commit: "abc1234", note: "n", issue: "https://github.com/example/demo/issues/42" });
   let html = renderSessionHtml(await readSession(dir));
-  assert.match(html, /Triage: fixed by maxim [\d-]+ · commit abc1234/);
+  assert.match(html, /Triage: fixed by ada [\d-]+ · commit abc1234/);
   assert.ok(html.includes('<a href="https://github.com/example/demo/issues/42">'));
   assert.match(html, /Triage: 1 fixed · 1 untriaged/, "header counts");
   // a hand-edited non-http issue value is shown as text, never linked

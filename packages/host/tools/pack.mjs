@@ -4,7 +4,6 @@
 // snapper.config.json, PLAY.cmd, README-TESTER.txt (CRLF) and, with --bundle, snapper/ (the repo's dist/win-unpacked).
 // Exit codes: 0 ok, 1 error, 2 usage or refusal.
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { userInfo } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveConfig, gitInfo, listTree, writeZip, SNAPPER_VERSION } from "../../core/index.mjs";
@@ -103,7 +102,7 @@ export function readmeTester({ developer, slug, markKey = "F8", homepage = null,
 // ---- pack -------------------------------------------------------------------------------------------------------
 
 const yyyymmdd = (d = new Date()) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-const defaultDeveloper = () => { try { return userInfo().username || "the developer"; } catch { return process.env.USERNAME || "the developer"; } };
+const defaultDeveloper = () => "the developer";   // never the OS user name: it would leak the developer's account to testers
 function homepageOf() {
   try { const h = JSON.parse(readFileSync(join(REPO, "package.json"), "utf8")).homepage; return typeof h === "string" && h.trim() ? h.trim() : null; } catch { return null; }
 }

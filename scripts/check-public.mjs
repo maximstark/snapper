@@ -28,10 +28,12 @@ const PLACEHOLDER = String.raw`(?:<[^>]*>|%[^%]*%|\$\{?\w+\}?|you|me|user|userna
 /** Text that never belongs here. `msg: false` rules are skipped for commit messages. */
 export const PRIVATE_TEXT = [
   { re: new RegExp(String.raw`\b[A-Za-z]:[\\/]+Users[\\/]+(?!${PLACEHOLDER}(?:[\\/"'\x60\s]|$))[^\\/\s"'\x60<>]+`, "i"), why: "a Windows user-profile path" },
+  { re: new RegExp(String.raw`/mnt/[a-z]/Users/(?!${PLACEHOLDER}(?:[/"'\x60\s]|$))[^/\s"'\x60<>]+`, "i"), why: "a Windows user-profile path" },
   { re: new RegExp(String.raw`(?:^|[\s"'\x60(=])/(?:home|Users)/(?!${PLACEHOLDER}(?:[/"'\x60\s]|$))[A-Za-z0-9_.-]+`), why: "a home-folder path" },
+  { re: new RegExp(String.raw`\\\\wsl(?:\.localhost|\$)[\\/]+[^\\/\s]+[\\/]+home[\\/]+(?!${PLACEHOLDER}(?:[\\/"'\x60\s]|$))[^\\/\s"'\x60<>]+`, "i"), why: "a home-folder path" },
   { re: /[A-Za-z0-9._%+-]+@(?!(?:maximstark\.art|anthropic\.com|users\.noreply\.github\.com|example\.(?:com|org|net))\b)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b/, why: "an email address" },
   { re: /claude\.ai\/(?:code\/)?session_[A-Za-z0-9]+/i, why: "a private Claude session link", msg: false },
-  { re: /sk-ant-[A-Za-z0-9_-]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----/, why: "a secret" },
+  { re: /sk-ant-[A-Za-z0-9_-]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|discord(?:app)?\.com\/api\/webhooks\/\d+\//, why: "a secret" },
 ];
 
 /** Files whose text is not scanned: third-party code and the lockfile. */
@@ -71,6 +73,14 @@ function main(argv) {
   const problems = [];
   let count = 0;
   const msgAt = argv.indexOf("--msg");
+  if (argv.includes("--push")) {
+    // pre-push stdin: "<local ref> <local sha> <remote ref> <remote sha>" per ref; branch and tag names are public too
+    let input = "";
+    try { input = readFileSync(0, "utf8"); } catch { input = ""; }
+    for (const ref of input.split(/\r?\n/).flatMap(l => l.trim().split(/\s+/).filter((_, i) => i === 0 || i === 2)).filter(Boolean)) {
+      problems.push(...checkFile(`ref ${ref}`, Buffer.from(ref), { terms, msg: true }));
+    }
+  }
   if (msgAt >= 0) {
     const file = argv[msgAt + 1];
     problems.push(...checkFile("commit message", readFileSync(file), { terms, msg: true }));

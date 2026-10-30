@@ -18,7 +18,7 @@ export const PLATFORMS = [
   { x: 20, y: 72, w: 64, h: 8 }, { x: 236, y: 134, w: 72, h: 8 },
 ];
 export const BOX = 12, COIN = 8, NCOINS = 8;
-const GRAVITY = 0.35, JUMP_V = -6.5, SPEED = 2, MAX_FALL = 8;   // -6.5 rises 57 px: platform 3 (y 72) is 52 px above platform 1 (y 124); -6 rose 48 and stranded the coins up there (Maxim's first 1.3 mark)
+const GRAVITY = 0.35, JUMP_V = -6.5, SPEED = 2, MAX_FALL = 8;   // -6.5 rises 57 px: platform 3 (y 72) is 52 px above platform 1 (y 124); -6 rose 48 and stranded the coins up there
 const roundN = v => Math.round(v * 1000) / 1000;
 
 /**

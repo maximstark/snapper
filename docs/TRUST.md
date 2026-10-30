@@ -1,6 +1,6 @@
 # What Snapper does to your game
 
-Snapper is an observer, and an observer can cause the bug it reports. This page lists what the host does to a page in each mode, so "was it Snapper?" can be answered from facts. It is written from the code (`packages/host`, Snapper 1.4.1) and was reviewed against it claim by claim by a second AI agent, three times. If a sentence here stops being true of the code, that is a bug.
+Snapper is an observer, and an observer can cause the bug it reports. This page lists what the host does to a page in each mode, so "was it Snapper?" can be answered from facts. It is written from the code (`packages/host`, Snapper 1.4.2) and was reviewed against it claim by claim by a second AI agent, three times. If a sentence here stops being true of the code, that is a bug.
 
 ## Play (`snapper play`, the launcher's Play)
 
@@ -14,7 +14,7 @@ Snapper is an observer, and an observer can cause the bug it reports. This page 
 - The SDK (`packages/sdk/snapper.js`, about 300 lines) through `Page.addScriptToEvaluateOnNewDocument`, in every frame (iframes too), before the game's first script: it defines `window.snapper`. It adds no DOM and no listeners. Its one timer, a 250 ms tape flush, starts at the game's first `tick`; `tick` itself allocates nothing, a flush with new ticks allocates two small typed arrays.
 - A preload script in Electron's isolated world (the page cannot see its variables, but it runs on the page's main thread). Since 1.4 its page-side code is `packages/host/preload/page.js`, embedded verbatim (the same code attach mode injects). It exposes `window.__snapperBridge`, the SDK's channel to the host; page code can call it too (a game can raise a mark through it). It:
   - runs one `requestAnimationFrame` callback per frame that records the frame interval (for `perf.json` and the frame-pacing auto-marks) and calls `navigator.getGamepads()` (for the gamepad mark combo; pad buttons and axes are also recorded in `tape.jsonl`), every frame while the page is visible, in every mode, whether or not the game reads pads.
-  - listens to `keydown`, `keyup` and `keypress` on `window` in the capture phase and records **every** key code with its time in `tape.jsonl`, including keys typed into the game's own text fields; plus `gamepadconnected`, `gamepaddisconnected` and a no-op `blur` listener; since 1.4.1, passive `pointerdown`, `pointermove` and `wheel` listeners on `window` in the capture phase that only note the time of the latest pointer event (nothing about the pointer is recorded; they exist so a mouse-only game counts as played, D-030); a 250 ms timer sends the recorded keys and pad changes to the host, and the latest pointer time when it changed.
+  - listens to `keydown`, `keyup` and `keypress` on `window` in the capture phase and records **every** key code with its time in `tape.jsonl`, including keys typed into the game's own text fields; plus `gamepadconnected`, `gamepaddisconnected` and a no-op `blur` listener; since 1.4.1, passive `pointerdown`, `pointermove` and `wheel` listeners on `window` in the capture phase that only note the time of the latest pointer event (nothing about the pointer is recorded; they exist so a mouse-only game counts as played); a 250 ms timer sends the recorded keys and pad changes to the host, and the latest pointer time when it changed.
   - owns the overlay: one `<div data-snapper-overlay>` appended to `<html>` (not `<body>`), `position: fixed`, `z-index: 2147483647`, its content in a closed shadow root, `pointer-events: none` except the note box and the F9 panel; if the page removes it, the 250 ms timer re-attaches it (in bare, the next toast or note box does). Outside bare mode a 250 ms timer redraws the chip and reports the overlay's rectangles, and the overlay is built at `DOMContentLoaded` (at once when the document has already loaded).
 
 **What is observed.** The debugger stays attached for the whole session with the CDP domains `Page`, `Runtime` and `Log` enabled. Events used: `Runtime.consoleAPICalled`, `Runtime.exceptionThrown`, `Log.entryAdded`, `Page.screencastFrame`. With `Runtime` enabled, every `console.*` call the game makes is serialised and sent to the host, in every mode; a game that logs every frame pays that per call. Electron events used: navigation start/finish/fail, renderer crash, and `before-input-event` (hotkeys). `Runtime.evaluate` runs in the page for:
@@ -74,7 +74,7 @@ The game runs in a browser **you** started (Chrome, Edge, or the game's own Elec
 
 **Recorded:** `env.json` `host.adapter: "cdp"`, `host.attach` (endpoint, target URL and title, the browser's product string, user agent, `reloaded`), `display` and `window` from the page, `gpu: null`.
 
-**Measured (Z3, 2026-10-22, the demo, 4 marks per run, `perf.json` `host`; `scripts/verify-attach.mjs` reproduces it):**
+**Measured (2026-10-22, the demo, 4 marks per run, `perf.json` `host`; `scripts/verify-attach.mjs` reproduces it):**
 
 | run | overlay-hide round trip, median (mean) | mark capture, median (mean, range) |
 |---|---|---|
@@ -88,7 +88,7 @@ The binding round trip is not measurably different from the preload's IPC (n = 4
 
 Everything in "Play" above, plus: the overlay asks the tester's name (on every run until a name is stored: Esc, a blank name or "anonymous" store nothing; keys typed there never reach the game, like the note box) and the host writes it to `tester.json` in the kit folder (the parent of the game folder; never in Snapper's own user data) and to `env.json` `tester`; the chip shows "F8 marks a moment" (the configured mark key) for the first 10 s after the game is ready (a toast in a bare session); the note box asks "What happened?". When the window closes the finished session folder is zipped to `<kit>/outbox/<slug>-<session id>.zip`, the game window shows "Send this file to <developer>: outbox\…" for about 2 s, and Windows Explorer opens on the zip (if zipping fails, the toast names the session folder to send instead). The zip is the whole session: every recorded key code, every screenshot and ring frame, the console, `env.json` (OS, GPU, display, local paths such as the game folder and Snapper's exe) and the tester's name; README-TESTER.txt tells the tester that it records a screenshot, the game's state, the last seconds of frames and their keys, and that nothing is uploaded; it does not list the machine details. **No network**: nothing is uploaded or sent; the tester sends the zip themselves. The kit's `snapper.config.json` is the developer's effective config without `out` and `discordWebhook`, plus `slug`, `developer`, `tester: true` and `pack` (the commit it was packed from); `snapper pack` leaves out the game's own `snapper.config.json` (it could hold a Discord webhook), any folder named `.git`, `node_modules`, `.snapper`, `.claude` or `dist` at any depth (a game that needs one of them at run time is packed broken), a root `outbox/`, anything `.snapperignore` lists, and the zip itself.
 
-## The measured overhead (Y5)
+## The measured overhead
 
 Ring buffer on vs `--bare`, 2026-10-21, on the build machine (3440×1440 at 180 Hz, RTX 5070 Ti, the play window at 1080p), with no known load on the machine. Measured with `scripts/verify-trust.mjs`.
 
@@ -100,6 +100,8 @@ Ring buffer on vs `--bare`, 2026-10-21, on the build machine (3440×1440 at 180 
 | demo | `--bare` | 5.56 ms | 5.6 ms | 5.77 ms | 0 | 85.3 ms |
 | Moonflex 1-1 | ring | 5.57 ms | 5.6 ms | 49.9 ms | 1 | 79.1 ms |
 | Moonflex 1-1 | `--bare` | 5.57 ms | 5.6 ms | 48.1 ms | 1 | 78.3 ms |
+
+Moonflex is the author's own platformer, used as a second test game.
 
 - **The ring buffer, the chip and the status poll do not change frame pacing measurably**: average (5.56 ms is the 180 Hz period), 95th percentile and drops are identical, and the max is within the run-to-run spread (demo 5.7–6.0 ms in all six runs; Moonflex 49.9–50.0 ms ring, 44.4–50.0 ms bare).
 - Moonflex's one drop, a 44–50 ms frame, appears in every run of both conditions: not the ring or the chip; its cause was not established (the game, the input, or Snapper's always-on parts).

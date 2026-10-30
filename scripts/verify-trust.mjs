@@ -1,10 +1,10 @@
-// Y5 — trust A/B (BRIEF-v1.3 §2.4, §7): what the ring buffer / overlay cost. The demo and Moonflex 1-1 are played with a
+// Y5 — trust A/B (BRIEF-v1.3 §2.4, §7): what the ring buffer / overlay cost. The demo and a second game (--game) are played with a
 // fixed smoke (20 s of inputs, a mark at the end of each 10 s half so two perf.json windows cover the 20 s, no fault keys),
 // ring on vs --bare, three runs each, alternating order (on, bare, on, bare, ...). Per run: the mean / max / p95 / drops of
 // perf.json intervalsMs over both marks, and the mean markCaptureMs; then the means per condition and the differences
 // (ring minus bare). The smoke is never tuned to hide a cost: whatever the numbers say is what gets written.
 // Also asserts: bare sessions have env.json host.bare true and no before/ folder in any mark; ring sessions have before/sheet.png.
-//   node scripts/verify-trust.mjs [--runs 3] [--game C:/Coding/moonflexforceabilities-v3] [--only demo|moonflex]
+//   node scripts/verify-trust.mjs [--runs 3] [--game <game root> [--query "?level=1"]] [--only demo|game2]
 //   EVIDENCE=1 writes private/evidence/<EVIDENCE_VERSION or v1.3>/y5/ (ab.json, ab.md, one bare SESSION.md; no images)
 import { join } from "node:path";
 import { readFile, writeFile, mkdir, rm, readdir, copyFile } from "node:fs/promises";
@@ -14,7 +14,8 @@ import { REPO, snapper, checklist, exists, EVIDENCE_ON, evidenceDir } from "./li
 const argv = process.argv.slice(2);
 const opt = (name, dflt) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : dflt);
 const RUNS = Number(opt("--runs", 3));
-const GAME = opt("--game", "C:/Coding/moonflexforceabilities-v3");
+const GAME = opt("--game", null);
+const GAME_QUERY = opt("--query", "");
 const ONLY = opt("--only", null);
 const Y5 = join(REPO, "sessions", "y5");
 const c = checklist("Y5 trust A/B (ring vs --bare)");
@@ -113,9 +114,10 @@ await rm(Y5, { recursive: true, force: true });
 await mkdir(Y5, { recursive: true });
 const results = [];
 if (!ONLY || ONLY === "demo") results.push(await target("demo", [join(REPO, "examples", "demo")]));
-if (!ONLY || ONLY === "moonflex") {
-  if (!(await exists(GAME))) c.check("Moonflex game root exists", false, GAME);
-  else results.push(await target("moonflex", [GAME, "--preset", "1080p", "--query", "?scene=stage&level=1-1"]));
+if (!ONLY || ONLY === "game2") {
+  if (!GAME) process.stdout.write("second-game target skipped (no --game <path>)\n");
+  else if (!(await exists(GAME))) c.check("second game root exists", false, GAME);
+  else results.push(await target("game2", [GAME, "--preset", "1080p", ...(GAME_QUERY ? ["--query", GAME_QUERY] : [])]));
 }
 
 // ------------------------------------------------------------------------------------------------ the table

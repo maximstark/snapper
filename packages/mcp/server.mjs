@@ -11,7 +11,7 @@
 //
 // No host imports: the package reads sessions through packages/core and runs replays and checks by spawning the Snapper
 // CLI given to it (`cli`: [cmd, ...args]), so it knows nothing about Electron.
-//   node packages/mcp/server.mjs --cli "node C:/Coding/Snapper/bin/snapper.mjs"
+//   node packages/mcp/server.mjs --cli "node <snapper-repo>/bin/snapper.mjs"
 //   snapper mcp                       (the host passes the right CLI spec, dev or packaged)
 import { createInterface } from "node:readline";
 import { TOOLS, callTool } from "./tools.mjs";
@@ -168,7 +168,7 @@ if (isMain) {
   const i = process.argv.indexOf("--cli");
   const cli = i > 0 && process.argv[i + 1] ? splitCommand(process.argv[i + 1]) : null;
   if (!cli || !cli.length) {
-    process.stderr.write('usage: node packages/mcp/server.mjs --cli "node C:/Coding/Snapper/bin/snapper.mjs"\n');
+    process.stderr.write('usage: node packages/mcp/server.mjs --cli "node <snapper-repo>/bin/snapper.mjs"\n');
     process.exitCode = 2;
   } else {
     startMcp({ cli }).then(code => { process.exitCode = code; });

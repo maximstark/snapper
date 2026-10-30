@@ -52,7 +52,7 @@ function client(cliLine) {
 let root, dir, c;
 before(async () => {
   root = await mkdtemp(join(tmpdir(), "snapper-mcp-"));
-  dir = join(root, ".snapper", "sessions", "moonflexforceabilities-v3", "2026-10-18T14-02-11");
+  dir = join(root, ".snapper", "sessions", "skyhop", "2026-10-18T14-02-11");
   await mkdir(dir, { recursive: true });
   await buildSessionA(dir, { garbage: false });
   c = client(`"${process.execPath}" "${FAKE}"`);
@@ -109,7 +109,7 @@ test("mcp: list_sessions and read_session on a fixture game", async () => {
   const s = await c.call("read_session", { session: dir });
   assert.equal(s.result.structuredContent.regenerated, true);
   assert.match(s.result.content[0].text, /^# Snapper session 2026-10-18T14-02-11/);
-  assert.match(s.result.content[0].text, /swan clips through the sluice/);
+  assert.match(s.result.content[0].text, /pigeon clips through the ledge/);
   const s2 = await c.call("read_session", { session: dir });
   assert.equal(s2.result.structuredContent.regenerated, false);
 });
@@ -118,7 +118,7 @@ test("mcp: read_mark returns note, state, summaries, files, replayable", async (
   const r = await c.call("read_mark", { session: dir, mark: "1" });
   const m = r.result.structuredContent;
   assert.equal(m.mark, "0001");
-  assert.equal(m.note, "swan clips through the sluice");
+  assert.equal(m.note, "pigeon clips through the ledge");
   assert.equal(m.state.level, "2-2");
   assert.equal(m.replayable, true);
   assert.match(m.replayCommand, /snapper replay .* 0001$/);

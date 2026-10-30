@@ -24,7 +24,7 @@ A session is a folder. Any adapter (the Electron host today, a Godot addon or a 
 
 - `<session-id>` is the local start time, `YYYY-MM-DDTHH-mm-ss`.
 - `<game-slug>` is `--slug`, else `snapper.config.json` `slug`, else the game root folder name, lower-cased, non-alphanumerics to `-`.
-- Default `<out>` is `<game-root>/.snapper/sessions` (D-009). `--out` overrides.
+- Default `<out>` is `<game-root>/.snapper/sessions`. `--out` overrides.
 
 ## Time and frame
 
@@ -39,7 +39,7 @@ One JSON object per line. Common keys: `kind`, `t`. Lines by kind:
 | `session` | `v:1, id, game, url, query, snapper (version), startedAt (ISO)` | first line |
 | `boot` | `ok, ms, error?` | the page finished loading (or failed: `did-fail-load`, or an exception before `ready`) |
 | `ready` | `sdk, state, frame, stepper, commands:[ids], sdkVersion?` | the SDK reported what the game registered (all false when no SDK) |
-| `reload` | `query?, url?` | the page reloaded or navigated; frame numbers and the tape restart. `query` is the new document's `location.search` (`"?scene=stage&level=2-1"`), `url` its address (D-022) |
+| `reload` | `query?, url?` | the page reloaded or navigated; frame numbers and the tape restart. `query` is the new document's `location.search` (`"?scene=stage&level=2-1"`), `url` its address (v1.1.1) |
 | `console` | `level ("error"\|"warn"), text, src?` | console errors and warnings only (all levels go to the mark's `log.json`) |
 | `exception` | `text, stack?` | uncaught exception or unhandled rejection |
 | `log` | `frame, level ("warn"\|"error"), msg, data?` | `snapper.log` at warn or above (lower levels only in `log.json`) |
@@ -57,13 +57,13 @@ One JSON object per line. Common keys: `kind`, `t`. Lines by kind:
 ```json
 {
   "format": 1, "snapper": "1.0.0", "startedAt": "2026-10-18T14:02:11-07:00",
-  "game": { "slug": "moonflexforceabilities-v3", "root": "C:/Coding/moonflexforceabilities-v3", "url": "http://127.0.0.1:51234/index.html", "query": "?scene=stage&level=2-2",
+  "game": { "slug": "skyhop", "root": "C:/games/skyhop", "url": "http://127.0.0.1:51234/index.html", "query": "?scene=stage&level=2-2",
             "git": { "sha": "024e9ae…", "branch": "main", "dirty": true } },
-  "host": { "adapter": "electron", "electron": "44.9.0", "chromium": "…", "node": "…", "platform": "win32", "arch": "x64", "os": "Windows 11 10.0.26300" },
+  "host": { "adapter": "electron", "electron": "44.9.0", "chromium": "…", "node": "…", "platform": "win32", "arch": "x64", "os": "Windows 11 10.0.26100" },
   "display": { "w": 3440, "h": 1440, "dpr": 1, "hz": 180 },
   "window": { "preset": "ultrawide", "w": 3440, "h": 1440, "fullscreen": true },
-  "gpu": "NVIDIA GeForce RTX 5070 Ti (ANGLE D3D11)",
-  "gamepads": [ { "index": 0, "id": "Xbox Wireless Controller", "mapping": "standard" } ],
+  "gpu": "NVIDIA GeForce RTX 4060 (ANGLE D3D11)",
+  "gamepads": [ { "index": 0, "id": "Generic USB Gamepad (Vendor: 1234 Product: 5678)", "mapping": "standard" } ],
   "sdk": { "present": true, "version": "1.0.0", "state": true, "frame": true, "stepper": true, "keymap": ["KeyA","KeyD","KeyW","KeyS","Space","KeyK","KeyL"], "pauseParam": "paused", "commands": ["mute"] },
   "config": { "hotkeys": { "mark": "F8", "overlay": "F9", "pause": "F10", "step": "F7", "fullscreen": "F11" }, "padMark": [8, 9], "ringSeconds": 5, "fpsDropMs": 250, "fpsDropRun": 10 }
 }
@@ -83,9 +83,9 @@ Then two kinds of line, which may coexist:
 
 Replay uses frame lines from the last `reload` marker (or the start) before the mark's frame. Wall lines are evidence for Claude, not a replay source.
 
-Additive (D-022, format stays 1): host-written `reload` markers (in `tape.jsonl` and in `session.jsonl`) also carry `query` (the new document's `location.search`, without the host's pause param) and `url`, e.g. `{"f":0,"ev":"reload","t":51234.5,"query":"?scene=stage&level=2-1","url":"http://127.0.0.1:5173/index.html?scene=stage&level=2-1"}`. A segment boots with its own `query` (the nearest marker at or before it that has one; a marker without one, as in sessions before 1.1.1 or an SDK reset, inherits the previous segment's), else `env.json` `game.query`; restore and replay use it.
+Additive (format stays 1): host-written `reload` markers (in `tape.jsonl` and in `session.jsonl`) also carry `query` (the new document's `location.search`, without the host's pause param) and `url`, e.g. `{"f":0,"ev":"reload","t":51234.5,"query":"?scene=stage&level=2-1","url":"http://127.0.0.1:5173/index.html?scene=stage&level=2-1"}`. A segment boots with its own `query` (the nearest marker at or before it that has one; a marker without one, as in sessions before 1.1.1 or an SDK reset, inherits the previous segment's), else `env.json` `game.query`; restore and replay use it.
 
-Additive (D-012, format stays 1): host-written `reload` markers also carry `t`, e.g. `{"f":0,"ev":"reload","t":51234.5}`; a reader picks the segment whose marker `t` is the last at or before the mark's `t`, and falls back to the last segment when markers are unstamped.
+Additive (format stays 1): host-written `reload` markers also carry `t`, e.g. `{"f":0,"ev":"reload","t":51234.5}`; a reader picks the segment whose marker `t` is the last at or before the mark's `t`, and falls back to the last segment when markers are unstamped.
 
 ## perf.json
 
@@ -114,18 +114,18 @@ replay/
 Derived, compact, for Claude's first read. Regenerated by the host after each mark and by `snapper summary`. Template:
 
 ```
-# Snapper session 2026-10-18T14-02-11 — moonflexforceabilities-v3 @ 024e9ae* — 2026-10-18 14:02
-http://127.0.0.1:51234/index.html?scene=stage&level=2-2 · ultrawide 3440×1440 fullscreen · 180 Hz · Chromium 1xx · Xbox Wireless Controller
+# Snapper session 2026-10-18T14-02-11 — skyhop @ 024e9ae* — 2026-10-18 14:02
+http://127.0.0.1:51234/index.html?scene=stage&level=2-2 · ultrawide 3440×1440 fullscreen · 180 Hz · Chromium 1xx · Generic USB Gamepad (Vendor: 1234 Product: 5678)
 Boot ok in 812 ms · SDK: state ✓ frame ✓ stepper ✓ (replayable) · 12 m 04 s · errors 2 · marks 5
 (* = working tree dirty when played)
 
 | # | t | frame | trigger | summary | errors | worst ms |
 |---|---|---|---|---|---|---|
-| 0001 | 0:42.3 | 2538 | hotkey | swan clips through the sluice | 0 | 17.2 |
+| 0001 | 0:42.3 | 2538 | hotkey | pigeon clips through the ledge | 0 | 17.2 |
 | 0002 | 1:10.0 | 4201 | exception | TypeError: cannot read 'x' of undefined (stage.js:412) | 1 | 16.9 |
 
 ## 0001 · 0:42.3 · frame 2538 · hotkey
-Note: swan clips through the sluice
+Note: pigeon clips through the ledge
 State: scene=stage level=2-2 player=(412.5,88.0) vel=(1.6,0) pose=glide hearts=3
 Events before: 0:40.1 land · 0:41.0 jump · 0:41.8 glide
 Errors: none
@@ -140,7 +140,7 @@ Exception: TypeError: cannot read 'x' of undefined
 
 Rules: the state line is the first-level scalars of `state.json`, truncated at 200 characters. At most the last five events before the mark. Stack traces at most three frames. Nothing else. The detail is in the files.
 
-## checkpoints/ and resumed sessions (additive, D-021; format stays 1)
+## checkpoints/ and resumed sessions (additive; format stays 1)
 
 A checkpoint (save state) is a frame number plus the game's state there. Restoring it boots the game paused and replays the session's tape segment to that frame; the saved state is the proof that it landed. Readers that do not know these keys ignore them.
 
@@ -158,9 +158,9 @@ A checkpoint (save state) is a frame number plus the game's state there. Restori
 ```
 
 - `kind` is `manual` | `mark` | `exit`; `trigger` is `save` | `mark` | `exit`.
-- `segment` names the tape segment the frame belongs to: `reloadT` is the `t` of the reload marker that starts it (`null` for the first), per D-012; `index` is its position.
+- `segment` names the tape segment the frame belongs to: `reloadT` is the `t` of the reload marker that starts it (`null` for the first); `index` is its position.
 - `restorable` is false when the game registered no stepper, had not ticked, or the tape has no frame lines. The file is still written.
-- A reader treats `marks/NNNN/state.json` plus the `mark` line as an implicit `mark-NNNN` checkpoint when the file is absent (sessions recorded before v1.1): `frame` and `t` from the line, `query` from `env.json`, `segment` by the same D-012 rule. It is built in memory and never written to the old session.
+- A reader treats `marks/NNNN/state.json` plus the `mark` line as an implicit `mark-NNNN` checkpoint when the file is absent (sessions recorded before v1.1): `frame` and `t` from the line, `query` from `env.json`, `segment` by the same rule. It is built in memory and never written to the old session.
 
 New `session.jsonl` lines:
 
@@ -171,11 +171,11 @@ New `session.jsonl` lines:
 
 A **resumed session** (`snapper play <game> --resume <session>|last [--at …]`) is an ordinary session plus:
 - `session` line and `env.json`: `resumedFrom: { session: "<source id>", checkpoint, frame }` (`env.json` adds `dir`).
-- `env.json` after the restore: `resumeMatched` (true/false; `null` when no saved state sat on that frame, e.g. `--at f<frame>`), `firstDiff` (path, when false), `restore: { frames, ms, fps, chunks, from, segment, query, querySource }`, `resumeError` on failure. `game.query` is the query the restore booted with (the segment's, D-022); `game.queryOverride: true` when `--query` forced it.
+- `env.json` after the restore: `resumeMatched` (true/false; `null` when no saved state sat on that frame, e.g. `--at f<frame>`), `firstDiff` (path, when false), `restore: { frames, ms, fps, chunks, from, segment, query, querySource }`, `resumeError` on failure. `game.query` is the query the restore booted with (the segment's); `game.queryOverride: true` when `--query` forced it.
 - `tape.jsonl`: the header, then the source segment's lines with `f <= frame` (frame lines, seed and earlier resume markers; wall lines are not copied), then `{"f":12345,"ev":"resume","from":"<source id>/<checkpoint>","t":…}`, then the live lines. The session is self-contained: a mark taken after the resume replays from boot. The `resume` marker is neither a frame line nor a reload, so segment selection and replay ignore it (continuity).
 - `SESSION.md`: line 3 gains `states N (exit @ frame F)`; a line `resumed from <source id>/<checkpoint> @ frame N (matched|DIFFERS|not compared)` follows it.
 
-## v1.3 additions: bare sessions, host overhead, accepted expectations (additive, D-027; format stays 1)
+## v1.3 additions: bare sessions, host overhead, accepted expectations (additive; format stays 1)
 
 - **`env.json` `host.bare`** (`true`|`false`, written by every 1.3 host). `config.bare` and `config.crossOriginIsolated` are in `config` like the other keys. A bare session (`snapper play --bare`, or `snapper.config.json` `"bare": true`) ran without the screencast ring buffer, the overlay chip and the F9 panel: its marks have **no `before/` folder**. Everything else is written as usual. `SESSION.md` line 2 says `bare`.
 - **`marks/NNNN/perf.json` `host`**: what the host was doing at that mark.
@@ -183,10 +183,10 @@ A **resumed session** (`snapper play <game> --resume <session>|last [--at …]`)
   "host": { "bare": false, "ringFrames": 52, "ringFps": 10.2, "markCaptureMs": { "0001": 61.4, "0002": 58.0 } }
   ```
   `ringFrames` = screencast frames held in the ring at the mark (0 when bare); `ringFps` = captured ring frames per second over the ring window (0 when bare); `markCaptureMs` = for every mark of the session so far, this one included, the wall milliseconds from the trigger to the end of the synchronous capture (tape flush, overlay hidden, screenshot, overlay shown, the one state/frame evaluate). There is no ring capture cost: screencast frames are produced by the compositor and their cost to the page cannot be measured from the host. `SESSION.md` gets one `Host overhead:` line from these.
-- **`marks/NNNN/expected.json`**, written only by `snapper check --accept` (never by the host): `{ "state": {…the replayed state…}, "frame": 2538, "acceptedAt": "<ISO>", "git": { "sha", "dirty" } | null, "host": "1.3.0" }`. When present, `snapper check` compares the replayed state with its `state` instead of `state.json` (the D-014 compare, top-level `perf` ignored). It is the only file v1.3 adds inside a mark folder; `session.jsonl` and `tape.jsonl` stay untouched.
+- **`marks/NNNN/expected.json`**, written only by `snapper check --accept` (never by the host): `{ "state": {…the replayed state…}, "frame": 2538, "acceptedAt": "<ISO>", "git": { "sha", "dirty" } | null, "host": "1.3.0" }`. When present, `snapper check` compares the replayed state with its `state` instead of `state.json` (the state compare, top-level `perf` ignored). It is the only file v1.3 adds inside a mark folder; `session.jsonl` and `tape.jsonl` stay untouched.
 - **`<game-root>/.snapper/checks/<timestamp>.json`** (or `<--out>/checks/`): the rows of a `snapper check` run, `{ v: 1, at, host, root, git, request, summary, rows }`. Outside the session folders.
 
-## v1.4 additions: attach mode, playtesters, triage, issues, the repro, the report (additive, D-028; format stays 1)
+## v1.4 additions: attach mode, playtesters, triage, issues, the repro, the report (additive; format stays 1)
 
 - **`env.json` `host.adapter`**: `"electron"` (a play session: Snapper's own window) or `"cdp"` (an attach session: a page in the user's own Chromium, reached over a DevTools WebSocket). An attach session adds `host.attach = { endpoint, target: { url, title }, browser, userAgent, reloaded }` (`browser` is the browser's own product string, e.g. `Chrome/141.0.7390.55` or `Edg/155.0.4283.62`; `reloaded` is false with `--no-reload`), `gpu: null` (not readable over the protocol), and `display`/`window` from the page (`screen`, `devicePixelRatio`, `innerWidth`/`innerHeight`). `SESSION.md` line 2 says `attached to <browser>`.
 - **`mark` lines** of an attach session started with `--no-reload` carry `replayable: false` and `replayableReason`: the game booted before Snapper was injected, so its tape does not start at its boot. `replay`, `check`, `export-repro` and the MCP refuse such marks; `SESSION.md` says `not replayable: attached without a reload`.
@@ -199,7 +199,7 @@ A **resumed session** (`snapper play <game> --resume <session>|last [--at …]`)
 - **`SESSION.html`**, next to `SESSION.md`, written at session end and by `snapper summary` (and after `triage`, `issue` and `import`): one static page (inline CSS, no script, images by relative path: `marks/NNNN/shot.png`, `before/sheet.png`, `frame.png`), every note and state string escaped. Derived like `SESSION.md`: regenerable at any time, never the source of truth.
 - **`replay.json` and `check.json` rows** gain `diffs`: up to three differing JSON paths, depth-first in key order, next to `firstDiff` (which is `diffs[0]`). `replay.md` adds a `Differs at:` line; the check table prints `differs $.a, $.b, $.c`.
 
-## v1.4.1 additions: played time (additive, D-030; format stays 1)
+## v1.4.1 additions: played time (additive; format stays 1)
 
 - **`end` line `activeMs` and `idleMs`**: the session's played time and the idle threshold it was measured with (`60000`). The session start counts as activity; so does every recorded key or pad change (the wall lines), every pointer event (`pointerdown`, `pointermove`, `wheel`; observed, never written to the tape) and every submitted note. Each gap between consecutive activities counts up to `idleMs`, and so does the tail from the last activity to the end, so a session left open and untouched counts at most `idleMs` of play. `durationMs` stays the wall time the session was open.
 - **`SESSION.md` line 3** says `played <activeMs> of <durationMs>` (e.g. `played 1 m 18 s of 11 h 43 m 36 s`) in place of the duration when the idle time (`durationMs − activeMs`) is `idleMs` or more; otherwise, and for sessions without `activeMs` (before 1.4.1, or still live), the duration as before. `snapper list --json` rows gain `activeMs` (or `null`), and their `duration` text follows the same rule.

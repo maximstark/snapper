@@ -96,7 +96,7 @@ test("reader: tolerates garbage, half-written lines, unknown kinds and a live se
   assert.equal(s.bad, 2, "the garbage line and the half-written last line are skipped");
   assert.equal(s.id, "2026-10-18T14-02-11");
   assert.equal(s.marks.length, 2);
-  assert.equal(s.marks[0].note, "swan clips through the sluice");
+  assert.equal(s.marks[0].note, "pigeon clips through the ledge");
   assert.equal(s.marks[0].info.before.count, 48);
   assert.equal(s.errors.length, 2);
   assert.ok(s.lines.some(l => l.kind === "mystery-kind-from-the-future"));

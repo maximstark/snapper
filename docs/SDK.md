@@ -84,7 +84,7 @@ When injected, the preload exposes `window.__snapperBridge` (via `contextBridge`
 A mark is replayable only if the game is a pure function of (boot URL, fixed-step inputs). Concretely:
 
 - **No wall-clock in the simulation.** RNG seeded from data, never from `Date.now()`; nothing in `update` reads `performance.now()`.
-- **Level transitions do not depend on fetch timing.** A transition that skips updates while a file loads consumes a wall-clock-dependent number of frames live, and a headless `step(n)` batch never lets the fetch resolve at all. Prefetch the next level (or the whole world) when a stage starts, so the swap is synchronous, or navigate the page (Snapper records the new query per segment, D-022). Found on Moonflex 2026-10-19: marks after an in-page level change restore into the previous level.
+- **Level transitions do not depend on fetch timing.** A transition that skips updates while a file loads consumes a wall-clock-dependent number of frames live, and a headless `step(n)` batch never lets the fetch resolve at all. Prefetch the next level (or the whole world) when a stage starts, so the swap is synchronous, or navigate the page (Snapper records the new query per segment).
 - **Page navigations are fine.** Each one starts a new tape segment with its own query; frame numbers restart.
 - **`step(n, codes)` is synchronous** and renders once at the end. If a game cannot avoid asynchronous work mid-step, `step` may return a Promise; the host and runner await it, but the first two rules still apply.
 

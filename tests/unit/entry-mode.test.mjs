@@ -52,7 +52,7 @@ test("entryMode: every CLI command is the cli role", () => {
 
 test("entryMode: an unknown first argument or a path → the launcher", () => {
   assert.equal(entryMode({}, ["frobnicate"]), "launcher");
-  assert.equal(entryMode({}, ["C:/Coding/moonflexforceabilities-v3"]), "launcher");
+  assert.equal(entryMode({}, ["C:/games/skyhop"]), "launcher");
   assert.equal(entryMode({}, ["./examples/demo"]), "launcher");
   assert.equal(entryMode({}, [""]), "launcher");
   assert.equal(entryMode({}, ["--inspect"]), "launcher");

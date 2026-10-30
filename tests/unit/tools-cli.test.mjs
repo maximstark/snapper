@@ -18,7 +18,7 @@ const snapper = (...args) => spawnSync(process.execPath, [CLI, ...args], { encod
 
 async function gameWithSession(opts) {
   const root = await tmp();
-  const dir = join(root, ".snapper", "sessions", "moonflexforceabilities-v3", "2026-10-18T14-02-11");
+  const dir = join(root, ".snapper", "sessions", "skyhop", "2026-10-18T14-02-11");
   await mkdir(dir, { recursive: true });
   await buildSessionA(dir, opts);
   return { root, dir };
@@ -32,14 +32,14 @@ test("summary: regenerates SESSION.md and prints its path", async () => {
   assert.ok(existsSync(join(dir, "SESSION.html")), "v1.4: SESSION.html next to SESSION.md");
   const md = await readFile(join(dir, "SESSION.md"), "utf8");
   assert.match(md, /^# Snapper session 2026-10-18T14-02-11/);
-  assert.match(md, /swan clips through the sluice/);
+  assert.match(md, /pigeon clips through the ledge/);
   assert.equal(snapper("summary", join(dir, "nope")).status, 2);
   assert.equal(snapper("summary").status, 2);
 });
 
 test("list: newest first, one line each, --json", async () => {
   const { root, dir } = await gameWithSession();
-  const older = join(root, ".snapper", "sessions", "moonflexforceabilities-v3", "2026-10-17T09-00-00");
+  const older = join(root, ".snapper", "sessions", "skyhop", "2026-10-17T09-00-00");
   await mkdir(older, { recursive: true });
   await buildSessionA(older, { garbage: false });
   // make the older one live: drop its end line
@@ -50,7 +50,7 @@ test("list: newest first, one line each, --json", async () => {
   assert.equal(r.status, 0, r.stderr);
   const rows = r.stdout.trim().split("\n");
   assert.equal(rows.length, 2);
-  assert.match(rows[0], /^2026-10-18T14-02-11 {2}moonflexforceabilities-v3 {2}marks 2 {2}errors 2 {2}12 m 04 s {2}/);
+  assert.match(rows[0], /^2026-10-18T14-02-11 {2}skyhop {2}marks 2 {2}errors 2 {2}12 m 04 s {2}/);
   assert.ok(rows[0].endsWith(dir) && !rows[0].includes("(live)"));
   assert.match(rows[1], /^2026-10-17T09-00-00/);
   assert.match(rows[1], /\(live\)/);
@@ -99,7 +99,7 @@ test("skill install: copies the skill, replaces files, refuses a missing root", 
 test("doctor: one line per check, ok or MISSING with a hint", () => {
   const r = snapper("doctor");
   const lines = r.stdout.trim().split("\n");
-  for (const name of ["snapper 1.4.1", "node ", "electron", "packaged", "git", "sdk", "--coi"]) {
+  for (const name of ["snapper 1.4.2", "node ", "electron", "packaged", "git", "sdk", "--coi"]) {
     assert.ok(lines.some(l => l.includes(name)), `doctor mentions ${name}: ${r.stdout}`);
   }
   const coi = lines.find(l => l.includes("--coi"));
@@ -158,7 +158,7 @@ test("replay: refusals exit 2 with a clear message, no browser launched", async 
 
 test("list: saved states add `states N (exit fN)` to the row and checkpoints/exitFrame to --json", async () => {
   const { root, dir } = await gameWithSession({ garbage: false });
-  const other = join(root, ".snapper", "sessions", "moonflexforceabilities-v3", "2026-10-17T09-00-00");
+  const other = join(root, ".snapper", "sessions", "skyhop", "2026-10-17T09-00-00");
   await mkdir(other, { recursive: true });
   await buildSessionA(other, { garbage: false });
   const cp = (name, kind, frame, t) => writeCheckpoint(dir, makeCheckpoint({ name, kind, frame, t, restorable: true, state: {} }));
@@ -168,7 +168,7 @@ test("list: saved states add `states N (exit fN)` to the row and checkpoints/exi
   await writeCheckpoint(other, makeCheckpoint({ name: "0001", kind: "manual", frame: 99, t: 1, restorable: true, state: {} }));
 
   const rows = snapper("list", root).stdout.trim().split("\n");
-  assert.match(rows[0], /^2026-10-18T14-02-11 {2}moonflexforceabilities-v3 {2}marks 2 {2}errors 2 {2}12 m 04 s {2}states 3 \(exit f12345\) {2}/);
+  assert.match(rows[0], /^2026-10-18T14-02-11 {2}skyhop {2}marks 2 {2}errors 2 {2}12 m 04 s {2}states 3 \(exit f12345\) {2}/);
   assert.ok(rows[0].endsWith(dir));
   assert.match(rows[1], /^2026-10-17T09-00-00 .* {2}states 1 {2}/, "no exit state: just the count");
   assert.ok(!rows[1].includes("(exit"));

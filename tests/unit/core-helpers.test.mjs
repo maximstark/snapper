@@ -118,7 +118,7 @@ test("static server: MIME, no-cache, index.html, traversal blocked", async () =>
 });
 
 test("config: slug, precedence, git info", async () => {
-  assert.equal(slugify("MoonFlex Force_Abilities v3!"), "moonflex-force-abilities-v3");
+  assert.equal(slugify("Sky Hop Deluxe_Edition v3!"), "sky-hop-deluxe-edition-v3");
   const root = await mkdtemp(join(tmpdir(), "snapper-game-"));
   await writeFile(join(root, "snapper.config.json"), JSON.stringify({ slug: "MyGame", preset: "ultrawide", hotkeys: { mark: "F6" }, ringSeconds: 3 }));
   const r = resolveConfig({ root, flags: { preset: "deck", ringSeconds: undefined } });

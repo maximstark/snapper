@@ -1,15 +1,15 @@
-# Snapper session 2026-10-18T14-02-11 — moonflexforceabilities-v3 @ 024e9ae* — 2026-10-18 14:02
-http://127.0.0.1:51234/index.html?scene=stage&level=2-2 · ultrawide 3440×1440 fullscreen · 180 Hz · Chromium 146 · Xbox Wireless Controller
+# Snapper session 2026-10-18T14-02-11 — skyhop @ 024e9ae* — 2026-10-18 14:02
+http://127.0.0.1:51234/index.html?scene=stage&level=2-2 · ultrawide 3440×1440 fullscreen · 180 Hz · Chromium 146 · Generic USB Gamepad (Vendor: 1234 Product: 5678)
 Boot ok in 812 ms · SDK: state ✓ frame ✓ stepper ✓ (replayable) · 12 m 04 s · errors 2 · marks 2
 (* = working tree dirty when played)
 
 | # | t | frame | trigger | summary | errors | worst ms |
 |---|---|---|---|---|---|---|
-| 0001 | 0:42.3 | 2538 | hotkey | swan clips through the sluice | 0 | 17.2 |
+| 0001 | 0:42.3 | 2538 | hotkey | pigeon clips through the ledge | 0 | 17.2 |
 | 0002 | 1:10.0 | 4201 | exception | TypeError: cannot read 'x' of undefined (stage.js:412) | 1 | 16.9 |
 
 ## 0001 · 0:42.3 · frame 2538 · hotkey
-Note: swan clips through the sluice
+Note: pigeon clips through the ledge
 State: scene=stage level=2-2 player=(412.5,88) vel=(1.6,0) pose=glide hearts=3
 Events before: 0:40.1 land · 0:41.0 jump · 0:41.8 glide
 Errors: none

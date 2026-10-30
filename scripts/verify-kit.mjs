@@ -41,7 +41,7 @@ async function untar(zip, dest) {
 
 // ---- 1. pack, plain
 const plainZip = join(KIT, "demo-kit.zip");
-const p1 = await snapper(["pack", DEMO, "--out", plainZip, "--developer", "Maxim"], { echo: false });
+const p1 = await snapper(["pack", DEMO, "--out", plainZip, "--developer", "Ada"], { echo: false });
 c.check("pack examples/demo (no bundle)", p1.code === 0 && await exists(plainZip), p1.stderr.trim());
 sizes.plain = (await stat(plainZip)).size;
 const U1 = join(tmp, "plain");
@@ -49,12 +49,12 @@ await untar(plainZip, U1);
 c.check("tar.exe unzips it: game/index.html, game/game.js, PLAY.cmd, README-TESTER.txt, snapper.config.json",
   ["game/index.html", "game/game.js", "PLAY.cmd", "README-TESTER.txt", "snapper.config.json"].every(f => existsSync(join(U1, ...f.split("/")))));
 const cfg = JSON.parse(await readFile(join(U1, "snapper.config.json"), "utf8"));
-c.check("snapper.config.json: developer, tester true, pack.sha, slug", cfg.developer === "Maxim" && cfg.tester === true && /^[0-9a-f]{40}$/.test(cfg.pack?.sha) && cfg.slug === "demo", JSON.stringify(cfg.pack));
+c.check("snapper.config.json: developer, tester true, pack.sha, slug", cfg.developer === "Ada" && cfg.tester === true && /^[0-9a-f]{40}$/.test(cfg.pack?.sha) && cfg.slug === "demo", JSON.stringify(cfg.pack));
 const play = await readFile(join(U1, "PLAY.cmd"), "utf8");
 c.check("PLAY.cmd runs the installed snapper.cmd with --tester and the kit config, else opens the README",
   play.includes("%LOCALAPPDATA%\\Programs\\Snapper\\snapper.cmd") && play.includes('play "%~dp0game" --tester --config "%~dp0snapper.config.json"') && play.includes('notepad "%~dp0README-TESTER.txt"') && play.includes("\r\n"));
 const readme = await readFile(join(U1, "README-TESTER.txt"), "utf8");
-c.check("README-TESTER.txt names the developer, F8, PLAY.cmd, outbox, and the download line", /Maxim/.test(readme) && /F8/.test(readme) && /PLAY\.cmd/.test(readme) && /outbox/.test(readme) && /Download Snapper:/.test(readme));
+c.check("README-TESTER.txt names the developer, F8, PLAY.cmd, outbox, and the download line", /Ada/.test(readme) && /F8/.test(readme) && /PLAY\.cmd/.test(readme) && /outbox/.test(readme) && /Download Snapper:/.test(readme));
 c.check("no .git / node_modules / .snapper / outbox inside game/", !(await readdir(join(U1, "game"))).some(n => [".git", "node_modules", ".snapper", "outbox", ".claude", "dist"].includes(n)));
 
 // ---- 1b. pack, bundled
@@ -62,7 +62,7 @@ const winUnpacked = join(REPO, "dist", "win-unpacked");
 const bundleZip = join(KIT, "demo-kit-bundle.zip");
 if (existsSync(join(winUnpacked, "snapper.cmd"))) {
   const t0 = Date.now();
-  const p2 = await snapper(["pack", DEMO, "--out", bundleZip, "--bundle", "--developer", "Maxim"], { echo: false, timeoutMs: 900000 });
+  const p2 = await snapper(["pack", DEMO, "--out", bundleZip, "--bundle", "--developer", "Ada"], { echo: false, timeoutMs: 900000 });
   c.check("pack --bundle", p2.code === 0 && await exists(bundleZip), `${p2.stderr.trim()} (${Math.round((Date.now() - t0) / 1000)} s)`);
   sizes.bundle = (await stat(bundleZip)).size;
   const U2 = join(tmp, "bundle");
