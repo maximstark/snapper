@@ -82,7 +82,8 @@ test("check: a changed copy differs under $.player, --accept makes it match, the
   const res = JSON.parse(d.stdout.trim().split("\n").pop());
   assert.ok(res.summary.differs >= 1, JSON.stringify(res.summary));
   const diffs = res.rows.filter(x => x.result === "differs");
-  assert.ok(diffs.every(x => x.firstDiff.startsWith("$.player")), JSON.stringify(diffs.map(x => x.firstDiff)));
+  // a faster player can also consume the seeded RNG at a different step first, so $.rng is a legitimate first difference
+  assert.ok(diffs.every(x => /^\$\.(player|rng)(\.|$)/.test(x.firstDiff)), JSON.stringify(diffs.map(x => x.firstDiff)));
   assert.ok(diffs.some(x => x.firstDiff === "$.player.x"));
   assert.equal(res.summary.exit, 1);
   assert.equal(existsSync(join(sessionDir, "marks", "0001", "expected.json")), false, "a plain check writes nothing into the session");
