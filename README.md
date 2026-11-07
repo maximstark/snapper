@@ -4,7 +4,11 @@ Playtest capture for web games. Play your HTML/JS game, press **F8** when someth
 
 Windows, 64-bit. Free and open source under the [MIT licence](LICENSE). Get the ready-made installer on itch.io (pay what you want), or build it from this repo.
 
-**Install:** [Snapper on itch.io](ITCH_URL) <!-- ITCH_URL: set on launch day -->: Windows installer or portable zip, unsigned (SmartScreen warns once; More info → Run anyway). Product page: [maximstark.art/snapper](https://maximstark.art/snapper/).
+[![A 55-second demo: a planted bug in a web game, marked with F8, then triaged, fixed and replayed by Claude Code](https://maximstark.art/snapper/demo-poster.webp)](https://maximstark.art/snapper/demo.mp4)
+
+*The 55-second demo: play, press F8, type a line, then Claude Code reads the session, finds the cause, fixes it and replays the mark. The bug was planted for the demo; the capture, the triage and the fix are real.*
+
+**Install:** [Snapper on itch.io](https://maximstark.itch.io/snapper): Windows installer or portable zip, unsigned (SmartScreen warns once; More info → Run anyway). Product page: [maximstark.art/snapper](https://maximstark.art/snapper/).
 
 - `docs/SESSION_FORMAT.md` — the engine-neutral session folder
 - `docs/SDK.md` — the `window.snapper` contract (about 10 lines in your game for state, about 40 for replay)
